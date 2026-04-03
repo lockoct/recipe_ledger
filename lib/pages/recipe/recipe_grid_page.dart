@@ -256,9 +256,7 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
                 children: [
                   Text(
                     recipe.name,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: Theme.of(context).textTheme.bodyLarge,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

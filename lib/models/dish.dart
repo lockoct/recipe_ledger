@@ -28,6 +28,10 @@ class Dish {
   @HiveField(4)
   final DateTime updateTime;
 
+  /// 菜品分类
+  @HiveField(5)
+  final String category;
+
   /// 构造函数
   const Dish({
     required this.id,
@@ -35,6 +39,7 @@ class Dish {
     required this.price,
     required this.city,
     required this.updateTime,
+    required this.category,
   });
 
   /// 从JSON创建菜品实例
@@ -45,6 +50,7 @@ class Dish {
       price: (json['price'] as num).toDouble(),
       city: json['city'] as String,
       updateTime: DateTime.parse(json['updateTime'] as String),
+      category: json['category'] as String,
     );
   }
 
@@ -56,6 +62,7 @@ class Dish {
       'price': price,
       'city': city,
       'updateTime': updateTime.toIso8601String(),
+      'category': category,
     };
   }
 
@@ -66,6 +73,7 @@ class Dish {
     double? price,
     String? city,
     DateTime? updateTime,
+    String? category,
   }) {
     return Dish(
       id: id ?? this.id,
@@ -73,12 +81,13 @@ class Dish {
       price: price ?? this.price,
       city: city ?? this.city,
       updateTime: updateTime ?? this.updateTime,
+      category: category ?? this.category,
     );
   }
 
   @override
   String toString() {
-    return 'Dish(id: $id, name: $name, price: $price, city: $city, updateTime: $updateTime)';
+    return 'Dish(id: $id, name: $name, price: $price, city: $city, updateTime: $updateTime, category: $category)';
   }
 
   @override
@@ -89,11 +98,12 @@ class Dish {
         other.name == name &&
         other.price == price &&
         other.city == city &&
-        other.updateTime == updateTime;
+        other.updateTime == updateTime &&
+        other.category == category;
   }
 
   @override
   int get hashCode {
-    return Object.hash(id, name, price, city, updateTime);
+    return Object.hash(id, name, price, city, updateTime, category);
   }
 }

@@ -173,6 +173,7 @@ class DishService {
           price: 0.02, // 元/克
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 1)),
+          category: DishCategories.fruitVegetables, // 果菜类
         ),
         Dish(
           id: '2',
@@ -180,6 +181,7 @@ class DishService {
           price: 0.015,
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 2)),
+          category: DishCategories.eggs, // 蛋类
         ),
         Dish(
           id: '3',
@@ -187,6 +189,7 @@ class DishService {
           price: 0.035,
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 3)),
+          category: DishCategories.meat, // 肉类
         ),
         Dish(
           id: '4',
@@ -194,6 +197,7 @@ class DishService {
           price: 0.008,
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 4)),
+          category: DishCategories.grains, // 粮油类
         ),
         Dish(
           id: '5',
@@ -201,6 +205,7 @@ class DishService {
           price: 0.006,
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 5)),
+          category: DishCategories.leafyVegetables, // 叶菜类
         ),
       ];
 

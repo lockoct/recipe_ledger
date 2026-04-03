@@ -10,18 +10,13 @@ import 'package:recipe_ledger/pages/profile/profile_page.dart';
 ///
 /// 使用BottomNavigationBar + IndexedStack实现标签切换，
 /// 支持保持页面状态（使用AutomaticKeepAliveClientMixin）。
-class MainNavigation extends StatefulWidget {
+class MainNavigation extends StatelessWidget {
   const MainNavigation({super.key});
 
-  @override
-  State<MainNavigation> createState() => _MainNavigationState();
-}
-
-class _MainNavigationState extends State<MainNavigation> {
-  final List<Widget> _pages = [
-    const DishListPage(), // 菜品页 - 暂时使用现有列表页，后续替换为网格页
-    const RecipeGridPage(), // 菜谱页 - 网格布局
-    const ProfilePage(), // 我的页面
+  static const _pages = [
+    DishListPage(),
+    RecipeGridPage(),
+    ProfilePage(),
   ];
 
   @override
@@ -35,9 +30,7 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationProvider.currentTabIndex,
-        onTap: (index) {
-          navigationProvider.setCurrentTabIndex(index);
-        },
+        onTap: navigationProvider.setCurrentTabIndex,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.restaurant),
@@ -52,7 +45,7 @@ class _MainNavigationState extends State<MainNavigation> {
             label: '我的',
           ),
         ],
-        type: BottomNavigationBarType.fixed, // 固定样式，避免标签动画
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

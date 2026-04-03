@@ -119,6 +119,64 @@ class AppRoutes {
   static const String settings = '/settings';
 }
 
+/// 菜品分类常量
+class DishCategories {
+  /// 根茎类
+  static const String rootVegetables = '根茎类';
+
+  /// 豆制品
+  static const String beanProducts = '豆制品';
+
+  /// 菌菇类
+  static const String mushrooms = '菌菇类';
+
+  /// 叶菜类
+  static const String leafyVegetables = '叶菜类';
+
+  /// 果菜类
+  static const String fruitVegetables = '果菜类';
+
+  /// 肉类
+  static const String meat = '肉类';
+
+  /// 海鲜类
+  static const String seafood = '海鲜类';
+
+  /// 调味品类
+  static const String seasonings = '调味品类';
+
+  /// 粮油类
+  static const String grains = '粮油类';
+
+  /// 水果类
+  static const String fruits = '水果类';
+
+  /// 蛋类
+  static const String eggs = '蛋类';
+
+  /// 乳制品
+  static const String dairy = '乳制品';
+
+  /// 所有菜品分类
+  static const List<String> all = [
+    rootVegetables,
+    beanProducts,
+    mushrooms,
+    leafyVegetables,
+    fruitVegetables,
+    meat,
+    seafood,
+    seasonings,
+    grains,
+    fruits,
+    eggs,
+    dairy,
+  ];
+
+  /// 默认选中的分类（不限）
+  static const String allCategories = '全部';
+}
+
 /// 应用主题常量
 class AppThemes {
   /// 主色调

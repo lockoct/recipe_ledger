@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:recipe_ledger/providers/app_provider.dart';
 import 'package:recipe_ledger/services/data_initialization_service.dart';
-import 'package:recipe_ledger/pages/settings/settings_page.dart';
+import 'package:recipe_ledger/pages/settings/unit_switch_page.dart';
 
 /// 个人中心页面
 ///
@@ -39,17 +39,32 @@ class ProfilePage extends StatelessWidget {
             statusBarBrightness: Brightness.light,
           ),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 用户信息卡片（与状态栏融为一体）
-              _buildUserInfoCard(context, appProvider),
-              const SizedBox(height: 24),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: const [0.0, 0.25, 0.8, 1.0], // 控制渐变位置
+              colors: [
+                primaryColor, // 顶部主题色
+                primaryColor, // 保持主题色 
+                const Color(0xFFF6F6F6),
+                const Color(0xFFF6F6F6), // 底部灰色背景
+              ],
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 用户信息卡片（与状态栏融为一体）
+                _buildUserInfoCard(context, appProvider),
+                const SizedBox(height: 10),
 
-              // 功能列表
-              _buildFunctionList(context),
-            ],
+                // 功能列表
+                _buildFunctionList(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -61,8 +76,7 @@ class ProfilePage extends StatelessWidget {
     final primaryColor = Theme.of(context).primaryColor;
 
     return Container(
-      color: primaryColor, // 与状态栏融为一体，使用主题色
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16), // 顶部填充考虑状态栏高度
+      padding: const EdgeInsets.fromLTRB(16, 40, 16, 16), // 顶部填充考虑状态栏高度
       child: Row(
         children: [
           // 头像（白色背景，主题色图标）
@@ -73,11 +87,7 @@ class ProfilePage extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.person,
-              size: 36,
-              color: primaryColor,
-            ),
+            child: Icon(Icons.person, size: 36, color: primaryColor),
           ),
           const SizedBox(width: 16),
 
@@ -88,10 +98,9 @@ class ProfilePage extends StatelessWidget {
               children: [
                 Text(
                   '用户', // TODO: 后续可以添加用户名功能
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -110,10 +119,20 @@ class ProfilePage extends StatelessWidget {
 
   /// 构建功能列表
   Widget _buildFunctionList(BuildContext context) {
-    return Card(
-      color: Colors.white, // 背景色改为白色
-      elevation: 0, // 去除阴影
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade100,
+            spreadRadius: 0,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           // 单位切换项
@@ -125,14 +144,18 @@ class ProfilePage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const UnitSwitchPage()),
               );
             },
           ),
           // 分隔线
-          const Divider(height: 0, indent: 16),
+          Divider(
+            height: 0,
+            color: Colors.grey.shade300, // 更淡的分割线颜色
+            thickness: 0.5,
+            indent: 16, // 左边距
+            endIndent: 16, // 右边距
+          ),
           // 初始化模拟数据项（开发用）
           _buildFunctionListItem(
             context,
@@ -142,7 +165,13 @@ class ProfilePage extends StatelessWidget {
             onTap: () => _initializeMockData(context),
           ),
           // 分隔线
-          const Divider(height: 0, indent: 16),
+          Divider(
+            height: 0,
+            color: Colors.grey.shade300, // 更淡的分割线颜色
+            thickness: 0.5,
+            indent: 16, // 左边距
+            endIndent: 16, // 右边距
+          ),
           // 关于项
           _buildFunctionListItem(
             context,
@@ -154,7 +183,13 @@ class ProfilePage extends StatelessWidget {
             },
           ),
           // 分隔线
-          const Divider(height: 0, indent: 16),
+          Divider(
+            height: 0,
+            color: Colors.grey.shade300, // 更淡的分割线颜色
+            thickness: 0.5,
+            indent: 16, // 左边距
+            endIndent: 16, // 右边距
+          ),
           // 帮助项
           _buildFunctionListItem(
             context,

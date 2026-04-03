@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 
 import 'package:recipe_ledger/utils/hive_init.dart';
 import 'package:recipe_ledger/providers/app_provider.dart';
@@ -81,6 +83,16 @@ class RecipeLedgerApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: '', // 使用系统默认字体，避免从Google Fonts加载
       ),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        SfGlobalLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('zh', 'CN'), // 中文
+        Locale('en', 'US'), // 英文
+      ],
       home: const MainNavigation(),
     );
   }

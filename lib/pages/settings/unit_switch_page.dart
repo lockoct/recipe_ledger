@@ -5,11 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:recipe_ledger/providers/app_provider.dart';
 import 'package:recipe_ledger/constants/app_constants.dart';
 
-/// 单位设置页面
+/// 单位切换页面
 ///
 /// 用于切换价格显示单位的页面，提供简单的单选列表。
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class UnitSwitchPage extends StatelessWidget {
+  const UnitSwitchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +69,10 @@ class SettingsPage extends StatelessWidget {
         if (!isLast)
           Divider(
             height: 0,
-            color: Colors.grey.shade300, // 更淡的分割线颜色
+            color: Colors.grey.shade300,
             thickness: 0.5,
-            indent: 16, // 左边距
-            endIndent: 16, // 右边距
+            indent: 16,
+            endIndent: 16,
           ),
       ],
     );
@@ -81,18 +81,15 @@ class SettingsPage extends StatelessWidget {
   /// 更新价格单位
   Future<void> _updateUnit(BuildContext context, String newUnit, AppProvider appProvider) async {
     if (newUnit == appProvider.userSettings.priceUnit) {
-      return; // 已选中当前单位，不执行操作
+      return;
     }
 
-    // 在异步操作前获取需要的对象
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final errorColor = Theme.of(context).colorScheme.error;
 
     try {
-      // 更新单位
       await appProvider.updatePriceUnit(newUnit);
 
-      // 显示成功消息
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text('价格单位已切换为 ${PriceUnits.getDisplayName(newUnit)}'),
@@ -101,7 +98,6 @@ class SettingsPage extends StatelessWidget {
         ),
       );
     } catch (error) {
-      // 显示错误消息
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text('切换单位失败: $error'),

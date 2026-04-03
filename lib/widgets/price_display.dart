@@ -26,13 +26,13 @@ class PriceDisplay extends StatelessWidget {
 
   /// 构造函数
   const PriceDisplay({
-    Key? key,
+    super.key,
     required this.pricePerGram,
     this.style,
     this.decimalPlaces = 2,
     this.showUnit = true,
     this.compact = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

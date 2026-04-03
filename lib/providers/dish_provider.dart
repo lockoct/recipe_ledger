@@ -21,6 +21,9 @@ class DishProvider extends ChangeNotifier {
   /// 选中的城市
   String? _selectedCity;
 
+  /// 选中的菜品分类
+  String? _selectedCategory;
+
   /// 是否正在加载
   bool _isLoading = false;
 
@@ -47,6 +50,9 @@ class DishProvider extends ChangeNotifier {
 
   /// 选中的城市（只读）
   String? get selectedCity => _selectedCity;
+
+  /// 选中的菜品分类（只读）
+  String? get selectedCategory => _selectedCategory;
 
   /// 是否正在加载（只读）
   bool get isLoading => _isLoading;
@@ -86,6 +92,12 @@ class DishProvider extends ChangeNotifier {
   void setSelectedCity(String? city) {
     _selectedCity = city;
     loadDishes(); // 重新加载菜品
+  }
+
+  /// 设置选中的菜品分类
+  void setSelectedCategory(String? category) {
+    _selectedCategory = category;
+    _applyFiltersAndSort(); // 只筛选现有数据，不需要重新加载
   }
 
   /// 设置排序方式
@@ -134,6 +146,7 @@ class DishProvider extends ChangeNotifier {
   void clearFilters() {
     _searchQuery = '';
     _selectedCity = null;
+    _selectedCategory = null;
     _sortType = DishSortType.nameAsc;
     loadDishes();
   }
@@ -147,7 +160,9 @@ class DishProvider extends ChangeNotifier {
 
       final matchesCity = _selectedCity == null || dish.city == _selectedCity;
 
-      return matchesSearch && matchesCity;
+      final matchesCategory = _selectedCategory == null || dish.category == _selectedCategory;
+
+      return matchesSearch && matchesCity && matchesCategory;
     }).toList();
 
     // 应用排序
@@ -176,6 +191,15 @@ class DishProvider extends ChangeNotifier {
     final cities = _dishes.map((dish) => dish.city).toSet().toList();
     cities.sort();
     return cities;
+  }
+
+  /// 根据ID获取菜品
+  Dish? getDishById(String id) {
+    try {
+      return _dishes.firstWhere((dish) => dish.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// 获取菜品的价格统计
