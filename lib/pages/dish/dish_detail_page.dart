@@ -9,6 +9,7 @@ import 'package:recipe_ledger/models/dish.dart';
 import 'package:recipe_ledger/utils/unit_converter.dart';
 import 'package:recipe_ledger/constants/app_constants.dart';
 import 'package:recipe_ledger/widgets/date_range_picker.dart';
+import 'package:recipe_ledger/widgets/price_trend_chart.dart';
 
 /// 菜品详情页面
 ///
@@ -33,6 +34,14 @@ class _DishDetailPageState extends State<DishDetailPage> {
   /// 结束日期
   DateTime _endDate = DateTime.now();
 
+  @override
+  void initState() {
+    super.initState();
+    // 将日期规范化为当天的开始和结束时间
+    _startDate = DateTime(_startDate.year, _startDate.month, _startDate.day);
+    _endDate = DateTime(_endDate.year, _endDate.month, _endDate.day, 23, 59, 59);
+  }
+
   /// 当前轮播索引
   int _currentImageIndex = 0;
 
@@ -42,11 +51,6 @@ class _DishDetailPageState extends State<DishDetailPage> {
     'assets/demo.jpeg',
     'assets/demo.jpeg',
   ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +108,7 @@ class _DishDetailPageState extends State<DishDetailPage> {
               top: MediaQuery.of(context).padding.top + 8,
               left: 16,
               child: GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () => Navigator.of(context).pop(),
                 child: Container(
                   width: 36,
                   height: 36,
@@ -313,23 +317,13 @@ class _DishDetailPageState extends State<DishDetailPage> {
           ),
           const SizedBox(height: 16),
 
-          // 价格趋势图表占位
-          Container(
+          // 价格趋势图表
+          SizedBox(
             height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: const Center(
-              child: Text(
-                '价格趋势图表\n(待实现)',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
-              ),
+            child: PriceTrendChart(
+              dishId: dish.id,
+              startDate: _startDate,
+              endDate: _endDate,
             ),
           ),
         ],
@@ -349,8 +343,8 @@ class _DishDetailPageState extends State<DishDetailPage> {
 
     if (picked != null) {
       setState(() {
-        _startDate = picked.start;
-        _endDate = picked.end;
+        _startDate = DateTime(picked.start.year, picked.start.month, picked.start.day);
+        _endDate = DateTime(picked.end.year, picked.end.month, picked.end.day, 23, 59, 59);
       });
     }
   }

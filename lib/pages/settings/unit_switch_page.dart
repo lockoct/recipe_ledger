@@ -57,7 +57,7 @@ class UnitSwitchPage extends StatelessWidget {
         ListTile(
           tileColor: Colors.white,
           title: Text(
-            PriceUnits.getDisplayName(unit),
+            PriceUnits.getSelectionDisplayName(unit),
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           trailing: Icon(
@@ -92,7 +92,7 @@ class UnitSwitchPage extends StatelessWidget {
 
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('价格单位已切换为 ${PriceUnits.getDisplayName(newUnit)}'),
+          content: Text('价格单位已切换为 ${PriceUnits.getSelectionDisplayName(newUnit)}'),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),

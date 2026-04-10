@@ -1,56 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'dish.dart';
+part of 'price_record.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DishAdapter extends TypeAdapter<Dish> {
+class PriceRecordAdapter extends TypeAdapter<PriceRecord> {
   @override
-  final int typeId = 100;
+  final int typeId = 104;
 
   @override
-  Dish read(BinaryReader reader) {
+  PriceRecord read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-
-    // 处理旧数据可能缺少category字段的情况
-    String category;
-    if (fields.containsKey(5) && fields[5] != null) {
-      category = fields[5] as String;
-    } else {
-      category = '未分类';
-    }
-
-    return Dish(
+    return PriceRecord(
       id: fields[0] as String,
-      name: fields[1] as String,
+      dishId: fields[1] as String,
       price: fields[2] as double,
-      city: fields[3] as String,
-      updateTime: fields[4] as DateTime,
-      category: category,
+      date: fields[3] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Dish obj) {
+  void write(BinaryWriter writer, PriceRecord obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.dishId)
       ..writeByte(2)
       ..write(obj.price)
       ..writeByte(3)
-      ..write(obj.city)
-      ..writeByte(4)
-      ..write(obj.updateTime)
-      ..writeByte(5)
-      ..write(obj.category);
+      ..write(obj.date);
   }
 
   @override
@@ -59,7 +44,7 @@ class DishAdapter extends TypeAdapter<Dish> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DishAdapter &&
+      other is PriceRecordAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

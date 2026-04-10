@@ -53,6 +53,9 @@ dependencies:
   # Syncfusion 本地化
   syncfusion_localizations: ^29.1.33
 
+  # 图表组件
+  fl_chart: ^0.70.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

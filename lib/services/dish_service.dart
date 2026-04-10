@@ -170,7 +170,7 @@ class DishService {
         Dish(
           id: '1',
           name: '西红柿',
-          price: 0.02, // 元/克
+          price: 4.16, // 元/斤（参考广州菜篮子价格8.31元/公斤）
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 1)),
           category: DishCategories.fruitVegetables, // 果菜类
@@ -178,7 +178,7 @@ class DishService {
         Dish(
           id: '2',
           name: '鸡蛋',
-          price: 0.015,
+          price: 5.59, // 元/斤（参考广州菜篮子价格11.17元/公斤）
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 2)),
           category: DishCategories.eggs, // 蛋类
@@ -186,7 +186,7 @@ class DishService {
         Dish(
           id: '3',
           name: '猪肉',
-          price: 0.035,
+          price: 17.38, // 元/斤（参考广州菜篮子精瘦肉价格34.75元/公斤）
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 3)),
           category: DishCategories.meat, // 肉类
@@ -194,7 +194,7 @@ class DishService {
         Dish(
           id: '4',
           name: '大米',
-          price: 0.008,
+          price: 3.0, // 元/斤（参考市场均价）
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 4)),
           category: DishCategories.grains, // 粮油类
@@ -202,7 +202,7 @@ class DishService {
         Dish(
           id: '5',
           name: '白菜',
-          price: 0.006,
+          price: 2.80, // 元/斤（参考广州菜篮子绍菜价格5.59元/公斤）
           city: '广州市',
           updateTime: DateTime.now().subtract(const Duration(days: 5)),
           category: DishCategories.leafyVegetables, // 叶菜类

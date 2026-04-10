@@ -1,61 +1,58 @@
-/// 应用常量定义
-
 /// 价格单位常量
 class PriceUnits {
-  /// 元/克
-  static const String yuanPerGram = '元/g';
-
   /// 元/斤
   static const String yuanPerJin = '元/斤';
 
-  /// 元/千克
-  static const String yuanPerKilogram = '元/kg';
-
-  /// 元/公斤
-  static const String yuanPerKilo = '元/公斤';
+  /// 元/公斤（千克）
+  static const String yuanPerKilogram = '元/公斤（千克）';
 
   /// 元/两
   static const String yuanPerLiang = '元/两';
 
   /// 所有可用的价格单位
   static const List<String> all = [
-    yuanPerGram,
     yuanPerJin,
     yuanPerKilogram,
-    yuanPerKilo,
     yuanPerLiang,
   ];
 
   /// 获取单位转换系数
   ///
-  /// 将内部存储的元/克转换为目标单位
+  /// 将内部存储的元/斤转换为目标单位
   static double getConversionFactor(String unit) {
     switch (unit) {
-      case yuanPerGram:
-        return 1.0;
       case yuanPerJin:
-        return 500.0; // 1斤 = 500克
+        return 1.0;
       case yuanPerKilogram:
-      case yuanPerKilo:
-        return 1000.0; // 1公斤 = 1000克
+        return 2.0; // 1公斤 = 2斤
       case yuanPerLiang:
-        return 50.0; // 1两 = 50克
+        return 0.1; // 1两 = 0.1斤
       default:
         return 1.0;
     }
   }
 
-  /// 获取单位显示名称
+  /// 获取单位显示名称（用于价格显示）
   static String getDisplayName(String unit) {
     switch (unit) {
-      case yuanPerGram:
-        return '元/克';
       case yuanPerJin:
         return '元/斤';
       case yuanPerKilogram:
-        return '元/千克';
-      case yuanPerKilo:
         return '元/公斤';
+      case yuanPerLiang:
+        return '元/两';
+      default:
+        return unit;
+    }
+  }
+
+  /// 获取单位选择显示名称（用于单位切换页面）
+  static String getSelectionDisplayName(String unit) {
+    switch (unit) {
+      case yuanPerJin:
+        return '元/斤';
+      case yuanPerKilogram:
+        return '元/公斤（千克）';
       case yuanPerLiang:
         return '元/两';
       default:
@@ -87,12 +84,14 @@ class HiveConstants {
   static const String dishBox = 'dish_box';
   static const String recipeBox = 'recipe_box';
   static const String userSettingsBox = 'user_settings_box';
+  static const String priceRecordBox = 'price_record_box';
 
   /// TypeId定义（从100开始递增）
   static const int dishTypeId = 100;
   static const int recipeTypeId = 101;
   static const int recipeIngredientTypeId = 102;
   static const int userSettingsTypeId = 103;
+  static const int priceRecordTypeId = 104;
 }
 
 /// 应用路由常量

@@ -6,11 +6,11 @@ import 'package:recipe_ledger/constants/app_constants.dart';
 
 /// 价格显示组件
 ///
-/// 类似Vue管道的概念，将内部存储的元/克价格转换为用户选择的单位显示。
+/// 类似Vue管道的概念，将内部存储的元/斤价格转换为用户选择的单位显示。
 /// 自动监听用户设置变化，当单位更改时自动更新显示。
 class PriceDisplay extends StatelessWidget {
-  /// 内部存储的价格（元/克）
-  final double pricePerGram;
+  /// 内部存储的价格（元/斤）
+  final double pricePerJin;
 
   /// 自定义样式（可选）
   final TextStyle? style;
@@ -27,7 +27,7 @@ class PriceDisplay extends StatelessWidget {
   /// 构造函数
   const PriceDisplay({
     super.key,
-    required this.pricePerGram,
+    required this.pricePerJin,
     this.style,
     this.decimalPlaces = 2,
     this.showUnit = true,
@@ -43,7 +43,7 @@ class PriceDisplay extends StatelessWidget {
 
         // 转换价格
         final convertedPrice = UnitConverter.convertPrice(
-          pricePerGram,
+          pricePerJin,
           targetUnit,
         );
 
@@ -92,18 +92,18 @@ class PriceDisplay extends StatelessWidget {
 ///
 /// 显示价格并提供单位切换按钮
 class PriceDisplayWithSelector extends StatefulWidget {
-  /// 内部存储的价格（元/克）
-  final double pricePerGram;
+  /// 内部存储的价格（元/斤）
+  final double pricePerJin;
 
   /// 允许的单位列表（可选，默认使用所有可用单位）
   final List<String>? availableUnits;
 
   /// 构造函数
   const PriceDisplayWithSelector({
-    Key? key,
-    required this.pricePerGram,
+    super.key,
+    required this.pricePerJin,
     this.availableUnits,
-  }) : super(key: key);
+  });
 
   @override
   State<PriceDisplayWithSelector> createState() =>
@@ -111,7 +111,7 @@ class PriceDisplayWithSelector extends StatefulWidget {
 }
 
 class _PriceDisplayWithSelectorState extends State<PriceDisplayWithSelector> {
-  String _selectedUnit = PriceUnits.yuanPerGram;
+  String _selectedUnit = PriceUnits.yuanPerJin;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +122,7 @@ class _PriceDisplayWithSelectorState extends State<PriceDisplayWithSelector> {
       children: [
         // 价格显示
         PriceDisplay(
-          pricePerGram: widget.pricePerGram,
+          pricePerJin: widget.pricePerJin,
           showUnit: false,
         ),
         const SizedBox(width: 4),
@@ -157,22 +157,22 @@ class _PriceDisplayWithSelectorState extends State<PriceDisplayWithSelector> {
 ///
 /// 显示价格范围（最低价-最高价）
 class PriceRangeDisplay extends StatelessWidget {
-  /// 最低价格（元/克）
-  final double minPricePerGram;
+  /// 最低价格（元/斤）
+  final double minPricePerJin;
 
-  /// 最高价格（元/克）
-  final double maxPricePerGram;
+  /// 最高价格（元/斤）
+  final double maxPricePerJin;
 
   /// 分隔符（默认：' - '）
   final String separator;
 
   /// 构造函数
   const PriceRangeDisplay({
-    Key? key,
-    required this.minPricePerGram,
-    required this.maxPricePerGram,
+    super.key,
+    required this.minPricePerJin,
+    required this.maxPricePerJin,
     this.separator = ' - ',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -182,8 +182,8 @@ class PriceRangeDisplay extends StatelessWidget {
         final targetUnit = userSettings.priceUnit;
 
         // 转换价格
-        final minPrice = UnitConverter.convertPrice(minPricePerGram, targetUnit);
-        final maxPrice = UnitConverter.convertPrice(maxPricePerGram, targetUnit);
+        final minPrice = UnitConverter.convertPrice(minPricePerJin, targetUnit);
+        final maxPrice = UnitConverter.convertPrice(maxPricePerJin, targetUnit);
 
         // 格式化显示
         final displayUnit = PriceUnits.getDisplayName(targetUnit);
@@ -203,27 +203,27 @@ class PriceRangeDisplay extends StatelessWidget {
 ///
 /// 显示价格变化（上涨/下跌）和百分比
 class PriceChangeIndicator extends StatelessWidget {
-  /// 当前价格（元/克）
-  final double currentPricePerGram;
+  /// 当前价格（元/斤）
+  final double currentPricePerJin;
 
-  /// 之前价格（元/克）
-  final double previousPricePerGram;
+  /// 之前价格（元/斤）
+  final double previousPricePerJin;
 
   /// 是否显示百分比（默认true）
   final bool showPercentage;
 
   /// 构造函数
   const PriceChangeIndicator({
-    Key? key,
-    required this.currentPricePerGram,
-    required this.previousPricePerGram,
+    super.key,
+    required this.currentPricePerJin,
+    required this.previousPricePerJin,
     this.showPercentage = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final change = currentPricePerGram - previousPricePerGram;
-    final percentage = (change / previousPricePerGram) * 100;
+    final change = currentPricePerJin - previousPricePerJin;
+    final percentage = (change / previousPricePerJin) * 100;
 
     Color color;
     IconData icon;

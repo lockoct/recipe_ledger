@@ -8,9 +8,11 @@ import 'package:recipe_ledger/providers/app_provider.dart';
 import 'package:recipe_ledger/providers/dish_provider.dart';
 import 'package:recipe_ledger/providers/navigation_provider.dart';
 import 'package:recipe_ledger/providers/recipe_provider.dart';
+import 'package:recipe_ledger/providers/price_record_provider.dart';
 import 'package:recipe_ledger/pages/main_navigation.dart';
 import 'package:recipe_ledger/services/dish_service.dart';
 import 'package:recipe_ledger/services/recipe_service.dart';
+import 'package:recipe_ledger/services/price_record_service.dart';
 
 void main() async {
   // 确保Flutter框架已初始化
@@ -33,8 +35,16 @@ void main() async {
         debugPrint('菜品数据库已有 ${dishes.length} 条数据');
       }
     } catch (error) {
-      // 模拟数据加载失败不影响应用启动
-      debugPrint('自动加载菜品模拟数据失败: $error');
+      // 数据格式不兼容，清空并重新初始化
+      debugPrint('加载菜品数据失败，清空并重新初始化: $error');
+      try {
+        await HiveInit.clearAllData();
+        final dishService = DishService();
+        await dishService.initializeMockData();
+        debugPrint('菜品数据重新初始化完成');
+      } catch (e) {
+        debugPrint('重新初始化菜品数据失败: $e');
+      }
     }
 
     // 检查菜谱数据是否为空（临时开发逻辑）
@@ -49,8 +59,26 @@ void main() async {
         debugPrint('菜谱数据库已有 ${recipes.length} 条数据');
       }
     } catch (error) {
-      // 模拟数据加载失败不影响应用启动
       debugPrint('自动加载菜谱模拟数据失败: $error');
+    }
+
+    // 检查价格记录数据是否为空（临时开发逻辑）
+    try {
+      final dishService = DishService();
+      final dishes = await dishService.getAllDishes();
+      final priceRecordService = PriceRecordService();
+      if (dishes.isNotEmpty) {
+        final records = await priceRecordService.getPriceRecords(dishId: dishes.first.id);
+        if (records.isEmpty) {
+          debugPrint('价格记录数据库为空，自动插入模拟数据...');
+          await priceRecordService.initializeMockData(dishes.map((d) => d.id).toList());
+          debugPrint('价格记录模拟数据插入完成');
+        } else {
+          debugPrint('价格记录数据库已有数据');
+        }
+      }
+    } catch (error) {
+      debugPrint('自动加载价格记录模拟数据失败: $error');
     }
   } catch (error) {
     debugPrint('Hive数据库初始化失败: $error');
@@ -64,6 +92,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => DishProvider()),
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => RecipeProvider()),
+        ChangeNotifierProvider(create: (context) => PriceRecordProvider()),
       ],
       child: const RecipeLedgerApp(),
     ),

@@ -175,7 +175,7 @@ class _DishListPageState extends State<DishListPage> {
                       ),
                       // 价格（底部，左对齐图标）
                       PriceDisplay(
-                        pricePerGram: dish.price,
+                        pricePerJin: dish.price,
                         compact: true,
                         style: priceStyle,
                       ),

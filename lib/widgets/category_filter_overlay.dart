@@ -44,6 +44,7 @@ class CategoryFilterOverlay extends StatelessWidget {
             ),
           ),
         ),
+        
         // 分类网格内容 - 从搜索栏下方展开
         Positioned(
           top: 64,

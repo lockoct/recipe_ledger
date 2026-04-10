@@ -6,6 +6,7 @@ import 'package:recipe_ledger/models/dish.dart';
 import 'package:recipe_ledger/models/recipe.dart';
 import 'package:recipe_ledger/models/recipe_ingredient.dart';
 import 'package:recipe_ledger/models/user_settings.dart';
+import 'package:recipe_ledger/models/price_record.dart';
 
 /// Hive数据库初始化工具
 class HiveInit {
@@ -51,6 +52,11 @@ class HiveInit {
     // 注册用户设置适配器 (typeId: 103)
     if (!Hive.isAdapterRegistered(UserSettingsAdapter().typeId)) {
       Hive.registerAdapter(UserSettingsAdapter());
+    }
+
+    // 注册价格记录适配器 (typeId: 104)
+    if (!Hive.isAdapterRegistered(PriceRecordAdapter().typeId)) {
+      Hive.registerAdapter(PriceRecordAdapter());
     }
   }
 

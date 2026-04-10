@@ -9,7 +9,7 @@ part 'user_settings.g.dart';
 class UserSettings {
   /// 价格显示单位
   ///
-  /// 可选值：元/g, 元/斤, 元/kg, 元/公斤
+  /// 可选值：元/斤, 元/公斤（千克）, 元/两
   @HiveField(0)
   final String priceUnit;
 
@@ -31,7 +31,7 @@ class UserSettings {
   /// 默认用户设置
   factory UserSettings.defaultSettings() {
     return const UserSettings(
-      priceUnit: '元/g',
+      priceUnit: '元/斤',
       currentCity: '广州市',
       autoSync: true,
     );

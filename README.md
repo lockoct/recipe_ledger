@@ -44,8 +44,8 @@
 - 保存/分享菜谱
 
 ### 3.4 单位设置
-- 默认单位：元/g
-- 可切换单位：元/斤、元/kg、元/公斤
+- 默认单位：元/斤
+- 可切换单位：元/斤、元/公斤（千克）、元/两
 - 单位切换后全局生效
 
 ### 3.5 离线功能
@@ -100,7 +100,7 @@
 class Dish {
   String id;
   String name;
-  double price; // 默认单位：元/g
+  double price; // 默认单位：元/斤
   String city;
   DateTime updateTime;
 }
@@ -128,7 +128,7 @@ class RecipeIngredient {
 ### 5.3 用户设置模型
 ```dart
 class UserSettings {
-  String priceUnit; // 元/g, 元/斤, 元/kg, 元/公斤
+  String priceUnit; // 元/斤, 元/公斤（千克）, 元/两
   String currentCity;
   bool autoSync;
 }
@@ -143,7 +143,7 @@ class UserSettings {
 4. 数据变更时：先更新本地缓存，网络恢复后同步到服务器
 
 ### 6.2 单位转换逻辑
-- 内部存储统一使用元/g
+- 内部存储统一使用元/斤
 - 显示时根据用户设置进行单位转换
 - 输入时根据当前单位进行转换后存储
 
