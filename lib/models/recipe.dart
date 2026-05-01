@@ -5,7 +5,7 @@ part 'recipe.g.dart';
 
 /// 菜谱数据模型
 ///
-/// 表示一个完整的菜谱，包含基本信息、配料列表和做法说明。
+/// 表示一个完整的菜谱，包含基本信息、配料列表、做法说明和注意事项。
 @HiveType(typeId: 101)
 class Recipe {
   /// 菜谱唯一标识
@@ -36,6 +36,10 @@ class Recipe {
   @HiveField(6)
   final DateTime updateTime;
 
+  /// 注意事项（富文本内容，可选）
+  @HiveField(7)
+  final String? notes;
+
   /// 构造函数
   const Recipe({
     required this.id,
@@ -45,6 +49,7 @@ class Recipe {
     required this.instructions,
     required this.createTime,
     required this.updateTime,
+    this.notes,
   });
 
   /// 从JSON创建菜谱实例
@@ -59,6 +64,7 @@ class Recipe {
       instructions: json['instructions'] as String,
       createTime: DateTime.parse(json['createTime'] as String),
       updateTime: DateTime.parse(json['updateTime'] as String),
+      notes: json['notes'] as String?,
     );
   }
 
@@ -72,6 +78,7 @@ class Recipe {
       'instructions': instructions,
       'createTime': createTime.toIso8601String(),
       'updateTime': updateTime.toIso8601String(),
+      'notes': notes,
     };
   }
 
@@ -84,6 +91,7 @@ class Recipe {
     String? instructions,
     DateTime? createTime,
     DateTime? updateTime,
+    String? notes,
   }) {
     return Recipe(
       id: id ?? this.id,
@@ -93,12 +101,13 @@ class Recipe {
       instructions: instructions ?? this.instructions,
       createTime: createTime ?? this.createTime,
       updateTime: updateTime ?? this.updateTime,
+      notes: notes ?? this.notes,
     );
   }
 
   @override
   String toString() {
-    return 'Recipe(id: $id, name: $name, coverImage: $coverImage, ingredients: $ingredients, instructions: $instructions, createTime: $createTime, updateTime: $updateTime)';
+    return 'Recipe(id: $id, name: $name, coverImage: $coverImage, ingredients: $ingredients, instructions: $instructions, createTime: $createTime, updateTime: $updateTime, notes: $notes)';
   }
 
   @override
@@ -111,7 +120,8 @@ class Recipe {
         other.ingredients == ingredients &&
         other.instructions == instructions &&
         other.createTime == createTime &&
-        other.updateTime == updateTime;
+        other.updateTime == updateTime &&
+        other.notes == notes;
   }
 
   @override
@@ -124,6 +134,7 @@ class Recipe {
       instructions,
       createTime,
       updateTime,
+      notes,
     );
   }
 }

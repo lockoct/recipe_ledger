@@ -24,13 +24,14 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
       instructions: fields[4] as String,
       createTime: fields[5] as DateTime,
       updateTime: fields[6] as DateTime,
+      notes: fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Recipe obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
       ..writeByte(5)
       ..write(obj.createTime)
       ..writeByte(6)
-      ..write(obj.updateTime);
+      ..write(obj.updateTime)
+      ..writeByte(7)
+      ..write(obj.notes);
   }
 
   @override

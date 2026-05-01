@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_ledger/models/recipe.dart';
 import 'package:recipe_ledger/providers/recipe_provider.dart';
+import 'package:recipe_ledger/pages/recipe/recipe_edit_page.dart';
 
 /// 菜谱网格页面
 ///
@@ -199,7 +200,7 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
             crossAxisCount: 2, // 2列网格
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.8, // 高度稍大于宽度
+            childAspectRatio: 1.05, // 高度稍大于宽度
           ),
           itemCount: filteredRecipes.length,
           itemBuilder: (context, index) {
@@ -250,53 +251,18 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
             ),
             // 菜谱信息
             Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    recipe.name,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '配料: ${recipe.ingredients.length} 种',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '更新: ${_formatDate(recipe.updateTime)}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
-                  ),
-                ],
+              padding: const EdgeInsets.only(left: 12, top: 8),
+              child: Text(
+                recipe.name,
+                style: Theme.of(context).textTheme.bodyLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  /// 格式化日期
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return '今天';
-    } else if (difference.inDays == 1) {
-      return '昨天';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}天前';
-    } else {
-      return '${date.month}/${date.day}';
-    }
   }
 
   /// 搜索输入变化处理
@@ -315,12 +281,16 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
   }
 
   /// 添加新菜谱
-  void _addNewRecipe() {
-    // TODO: 实现添加菜谱页面
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('添加菜谱功能开发中...'),
+  void _addNewRecipe() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const RecipeEditPage(),
       ),
     );
+
+    if (result == true && mounted) {
+      _recipeProvider.loadRecipes();
+    }
   }
 }

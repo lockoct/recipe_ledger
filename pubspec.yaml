@@ -36,7 +36,8 @@ dependencies:
   dio: ^5.3.2
 
   # 富文本编辑器
-  flutter_quill: ^9.2.0
+  flutter_quill: ^11.5.0
+  flutter_quill_extensions: ^11.0.0
 
   # 国际化
   intl: ^0.20.2
@@ -55,6 +56,12 @@ dependencies:
 
   # 图表组件
   fl_chart: ^0.70.2
+
+  # 图片选择
+  image_picker: ^1.0.4
+
+  # UUID生成
+  uuid: ^4.0.0
 
 dev_dependencies:
   flutter_test:

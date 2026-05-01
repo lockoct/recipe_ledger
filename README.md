@@ -75,10 +75,45 @@
 
 ### 4.4 菜谱编辑页
 - 菜谱基本信息编辑
+- 封面图片上传
 - 关联菜品选择器
 - 用量输入
 - 富文本做法编辑器
 - 保存/取消按钮
+
+### 4.4.1 新增菜谱页面
+页面布局（从上到下）：
+1. **菜谱封面区域**
+   - 默认显示占位图
+   - 点击可上传封面图片
+   - 支持从相册选择或拍照
+
+2. **菜谱名称输入**
+   - 单行文本输入框
+   - 必填字段
+
+3. **原材料列表区域**
+   - 标题栏 + 添加按钮
+   - 原材料卡片列表：
+     - 类型选择：菜品/其他
+     - 如果是菜品：下拉选择已有菜品
+     - 如果是其他：手动输入原材料名称
+     - 用量输入（单位：克）
+     - 删除按钮
+
+4. **做法步骤区域**
+   - 标题栏
+   - 富文本编辑器（flutter_quill）
+   - 支持文字格式、列表等
+
+5. **注意事项区域**
+   - 标题栏
+   - 富文本编辑器
+   - 可选填写
+
+6. **底部操作栏**
+   - 取消按钮
+   - 保存按钮
 
 ### 4.5 菜谱详情页
 - 菜谱基本信息展示
@@ -114,14 +149,18 @@ class Recipe {
   String? coverImage;
   List<RecipeIngredient> ingredients;
   String instructions; // 富文本内容
+  String? notes; // 注意事项（富文本内容）
   DateTime createTime;
   DateTime updateTime;
 }
 
 class RecipeIngredient {
-  String dishId;
-  double amount;
-  String unit;
+  String id;
+  String? dishId; // 如果是菜品类型，存储菜品ID
+  String? customName; // 如果不是菜品类型，存储自定义名称
+  double amount; // 用量（单位：克）
+  String unit; // 单位
+  bool isDish; // 是否为菜品类型
 }
 ```
 

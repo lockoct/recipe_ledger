@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 import 'package:recipe_ledger/utils/hive_init.dart';
 import 'package:recipe_ledger/providers/app_provider.dart';
@@ -117,6 +118,7 @@ class RecipeLedgerApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         SfGlobalLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
       ],
       supportedLocales: const [
         Locale('zh', 'CN'), // 中文

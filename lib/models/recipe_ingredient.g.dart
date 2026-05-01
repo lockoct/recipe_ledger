@@ -18,17 +18,19 @@ class RecipeIngredientAdapter extends TypeAdapter<RecipeIngredient> {
     };
     return RecipeIngredient(
       id: fields[0] as String,
-      dishId: fields[1] as String,
+      dishId: fields[1] as String?,
       amount: fields[2] as double,
       unit: fields[3] as String,
       notes: fields[4] as String?,
+      isDish: fields[5] as bool,
+      customName: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, RecipeIngredient obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +40,11 @@ class RecipeIngredientAdapter extends TypeAdapter<RecipeIngredient> {
       ..writeByte(3)
       ..write(obj.unit)
       ..writeByte(4)
-      ..write(obj.notes);
+      ..write(obj.notes)
+      ..writeByte(5)
+      ..write(obj.isDish)
+      ..writeByte(6)
+      ..write(obj.customName);
   }
 
   @override
