@@ -82,16 +82,16 @@ class HiveConstants {
 
   /// 盒子名称
   static const String dishBox = 'dish_box';
+  static const String dishListBox = 'dish_list_box';
   static const String recipeBox = 'recipe_box';
   static const String userSettingsBox = 'user_settings_box';
-  static const String priceRecordBox = 'price_record_box';
 
   /// TypeId定义（从100开始递增）
   static const int dishTypeId = 100;
+  static const int dishListItemTypeId = 105;
   static const int recipeTypeId = 101;
   static const int recipeIngredientTypeId = 102;
   static const int userSettingsTypeId = 103;
-  static const int priceRecordTypeId = 104;
 }
 
 /// 应用路由常量

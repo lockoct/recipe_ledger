@@ -3,10 +3,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:recipe_ledger/models/dish.dart';
+import 'package:recipe_ledger/models/dish_list_item.dart';
 import 'package:recipe_ledger/models/recipe.dart';
 import 'package:recipe_ledger/models/recipe_ingredient.dart';
 import 'package:recipe_ledger/models/user_settings.dart';
-import 'package:recipe_ledger/models/price_record.dart';
 
 /// Hive数据库初始化工具
 class HiveInit {
@@ -54,9 +54,9 @@ class HiveInit {
       Hive.registerAdapter(UserSettingsAdapter());
     }
 
-    // 注册价格记录适配器 (typeId: 104)
-    if (!Hive.isAdapterRegistered(PriceRecordAdapter().typeId)) {
-      Hive.registerAdapter(PriceRecordAdapter());
+    // 注册菜品列表项适配器 (typeId: 105)
+    if (!Hive.isAdapterRegistered(DishListItemAdapter().typeId)) {
+      Hive.registerAdapter(DishListItemAdapter());
     }
   }
 
