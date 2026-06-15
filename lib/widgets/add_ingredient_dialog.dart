@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:recipe_ledger/models/dish.dart';
+import 'package:recipe_ledger/models/dish_list_item.dart';
 import 'package:recipe_ledger/models/recipe_ingredient.dart';
 import 'package:recipe_ledger/providers/dish_provider.dart';
 
@@ -22,7 +22,7 @@ class AddIngredientDialog extends StatefulWidget {
 
 class AddIngredientDialogState extends State<AddIngredientDialog> {
   bool _isDish = true;
-  Dish? _selectedDish;
+  DishListItem? _selectedDish;
   String _customName = '';
   double _amount = 0;
   final _nameController = TextEditingController();
@@ -64,7 +64,7 @@ class AddIngredientDialogState extends State<AddIngredientDialog> {
     final dishProvider = context.read<DishProvider>();
     setState(() {
       _selectedDish = dishProvider.dishes.firstWhere(
-        (d) => d.id == dishId,
+        (d) => d.dishId == dishId,
         orElse: () => dishProvider.dishes.first,
       );
     });
@@ -102,7 +102,7 @@ class AddIngredientDialogState extends State<AddIngredientDialog> {
 
     final ingredient = RecipeIngredient(
       id: _isEditing ? widget.initialIngredient!.id : const Uuid().v4(),
-      dishId: _isDish ? _selectedDish!.id : null,
+      dishId: _isDish ? _selectedDish!.dishId : null,
       customName: _isDish ? null : _customName,
       amount: _amount,
       unit: '克',
@@ -261,7 +261,7 @@ class AddIngredientDialogState extends State<AddIngredientDialog> {
                         itemCount: dishes.length,
                         itemBuilder: (context, index) {
                           final dish = dishes[index];
-                          final isSelected = _selectedDish?.id == dish.id;
+                          final isSelected = _selectedDish?.dishId == dish.dishId;
                           return GestureDetector(
                             onTap: () => setState(() => _selectedDish = dish),
                             child: Container(

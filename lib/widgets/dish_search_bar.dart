@@ -1,17 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 
-import 'package:recipe_ledger/providers/app_provider.dart';
-import 'package:recipe_ledger/providers/dish_provider.dart';
+import "package:recipe_ledger/providers/app_provider.dart";
+import "package:recipe_ledger/providers/dish_provider.dart";
 
 /// 菜品页面专用搜索栏
-///
-/// 包含城市显示、搜索输入和筛选功能。
-/// 设计特点：
-/// - 左侧：定位图标 + 当前城市（可点击切换）
-/// - 中间：圆弧搜索框（高度适中）
-/// - 右侧：筛选按钮
-/// - 下方：筛选条件展示区域
 class DishSearchBar extends StatefulWidget {
   /// 搜索框提示文本
   final String hintText;
@@ -19,11 +12,15 @@ class DishSearchBar extends StatefulWidget {
   /// 搜索控制器（外部传入）
   final TextEditingController searchController;
 
+  /// 搜索回调
+  final VoidCallback? onSearch;
+
   /// 构造函数
   const DishSearchBar({
     super.key,
-    this.hintText = '搜索菜品名称...',
+    this.hintText = "搜索菜品名称...",
     required this.searchController,
+    this.onSearch,
   });
 
   @override
@@ -31,7 +28,7 @@ class DishSearchBar extends StatefulWidget {
 }
 
 class _DishSearchBarState extends State<DishSearchBar> {
-  final bool _showFilterOptions = false;
+  final bool _showCategoryFilter = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +52,11 @@ class _DishSearchBarState extends State<DishSearchBar> {
             ],
           ),
         ),
-
-        // 第二行：筛选条件展示（仅在应用筛选时显示）
-        if (_showFilterOptions || dishProvider.selectedCity != null) ...[
+        // 第二行：分类筛选展示（仅在应用筛选时显示）
+        if (_showCategoryFilter || dishProvider.queryForm.region != null) ...[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: _buildFilterOptions(context, dishProvider),
+            child: _buildCategoryFilter(context, dishProvider),
           ),
         ],
       ],
@@ -82,16 +78,11 @@ class _DishSearchBarState extends State<DishSearchBar> {
             children: [
               const Icon(Icons.location_on, size: 18, color: Colors.white),
               const SizedBox(width: 2),
-              SizedBox(
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    currentCity,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+              Text(
+                currentCity,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -117,7 +108,6 @@ class _DishSearchBarState extends State<DishSearchBar> {
         // 输入框和按钮内容（不受固定高度限制，保持自动居中）
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-
           child: Row(
             children: [
               const Icon(Icons.search, size: 20, color: Colors.grey),
@@ -135,7 +125,8 @@ class _DishSearchBarState extends State<DishSearchBar> {
                   ),
                   style: Theme.of(context).textTheme.bodyMedium,
                   onChanged: (value) {
-                    dishProvider.setSearchQuery(value);
+                    dishProvider.setName(value);
+                    widget.onSearch?.call();
                   },
                 ),
               ),
@@ -144,7 +135,8 @@ class _DishSearchBarState extends State<DishSearchBar> {
                 InkWell(
                   onTap: () {
                     widget.searchController.clear();
-                    dishProvider.setSearchQuery('');
+                    dishProvider.setName("");
+                    widget.onSearch?.call();
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
@@ -161,40 +153,27 @@ class _DishSearchBarState extends State<DishSearchBar> {
     );
   }
 
-  /// 构建筛选条件展示
-  Widget _buildFilterOptions(BuildContext context, DishProvider dishProvider) {
+  /// 构建分类筛选展示
+  Widget _buildCategoryFilter(BuildContext context, DishProvider dishProvider) {
     final List<Widget> filters = [];
 
-    // 城市筛选
-    if (dishProvider.selectedCity != null) {
+    if (dishProvider.queryForm.region != null) {
       filters.add(
-        _buildFilterChip(
+        _buildCategoryTag(
           context,
-          label: '城市: ${dishProvider.selectedCity}',
+          label: "区域: ${dishProvider.queryForm.region}",
           onRemove: () {
-            dishProvider.setSelectedCity(null);
+            dishProvider.setRegion(null);
           },
         ),
       );
     }
 
-    // 排序方式（作为筛选条件展示）
-    final sortText = _getSortText(dishProvider.sortType);
-    filters.add(
-      _buildFilterChip(
-        context,
-        label: '排序: $sortText',
-        onRemove: () {
-          dishProvider.setSortType(DishSortType.nameAsc);
-        },
-      ),
-    );
-
     return Wrap(spacing: 8, runSpacing: 8, children: filters);
   }
 
-  /// 构建筛选标签
-  Widget _buildFilterChip(
+  /// 构建分类标签
+  Widget _buildCategoryTag(
     BuildContext context, {
     required String label,
     required VoidCallback onRemove,
@@ -219,36 +198,17 @@ class _DishSearchBarState extends State<DishSearchBar> {
     );
   }
 
-  /// 获取排序方式文本
-  String _getSortText(DishSortType sortType) {
-    switch (sortType) {
-      case DishSortType.nameAsc:
-        return '名称 A-Z';
-      case DishSortType.nameDesc:
-        return '名称 Z-A';
-      case DishSortType.priceAsc:
-        return '价格升序';
-      case DishSortType.priceDesc:
-        return '价格降序';
-      case DishSortType.updateTimeDesc:
-        return '最新优先';
-      case DishSortType.updateTimeAsc:
-        return '最早优先';
-    }
-  }
-
-  /// 显示城市选择对话框
   void _showCitySelectionDialog(BuildContext context) {
     // TODO: 实现城市选择对话框
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('选择城市'),
-        content: const Text('城市选择功能开发中...'),
+        title: const Text("选择城市"),
+        content: const Text("城市选择功能开发中..."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('确定'),
+            child: const Text("确定"),
           ),
         ],
       ),

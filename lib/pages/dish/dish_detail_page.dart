@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:provider/provider.dart";
+import "package:carousel_slider/carousel_slider.dart";
 
-import 'package:recipe_ledger/providers/dish_provider.dart';
-import 'package:recipe_ledger/providers/app_provider.dart';
-import 'package:recipe_ledger/models/dish.dart';
-import 'package:recipe_ledger/utils/unit_converter.dart';
-import 'package:recipe_ledger/constants/app_constants.dart';
-import 'package:recipe_ledger/widgets/date_range_picker.dart';
-import 'package:recipe_ledger/widgets/price_trend_chart.dart';
+import "package:recipe_ledger/providers/dish_provider.dart";
+import "package:recipe_ledger/providers/app_provider.dart";
+import "package:recipe_ledger/models/dish.dart";
+import "package:recipe_ledger/utils/unit_converter.dart";
+import "package:recipe_ledger/constants/app_constants.dart";
+import "package:recipe_ledger/widgets/date_range_picker.dart";
+import "package:recipe_ledger/widgets/price_trend_chart.dart";
 
 /// 菜品详情页面
 ///
@@ -34,98 +34,135 @@ class _DishDetailPageState extends State<DishDetailPage> {
   /// 结束日期
   DateTime _endDate = DateTime.now();
 
-  @override
-  void initState() {
-    super.initState();
-    // 将日期规范化为当天的开始和结束时间
-    _startDate = DateTime(_startDate.year, _startDate.month, _startDate.day);
-    _endDate = DateTime(_endDate.year, _endDate.month, _endDate.day, 23, 59, 59);
-  }
-
   /// 当前轮播索引
   int _currentImageIndex = 0;
 
   /// 模拟图片列表（后续可从菜品数据中获取）
   final List<String> _imageList = [
-    'assets/demo.jpeg',
-    'assets/demo.jpeg',
-    'assets/demo.jpeg',
+    "assets/demo.jpeg",
+    "assets/demo.jpeg",
+    "assets/demo.jpeg",
   ];
+
+  Future<Dish?>? _dishFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _startDate = DateTime(_startDate.year, _startDate.month, _startDate.day);
+    _endDate = DateTime(_endDate.year, _endDate.month, _endDate.day, 23, 59, 59);
+    _dishFuture = Provider.of<DishProvider>(context, listen: false).get(widget.dishId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dishProvider = Provider.of<DishProvider>(context);
-    final dish = dishProvider.getDishById(widget.dishId);
-
-    if (dish == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('菜品详情'),
-          backgroundColor: Theme.of(context).primaryColor,
-          foregroundColor: Colors.white,
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Theme.of(context).primaryColor,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.light,
-          ),
-        ),
-        body: const Center(child: Text('菜品不存在')),
-      );
-    }
-
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
+      body: FutureBuilder<Dish?>(
+        future: _dishFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoading();
+          }
+
+          if (snapshot.hasError) {
+            return _buildError(snapshot.error.toString());
+          }
+
+          final dish = snapshot.data;
+          if (dish == null) {
+            return _buildNotFound();
+          }
+
+          return _buildContent(context, dish);
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("菜品详情"),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildError(String error) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("菜品详情"),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(child: Text("加载失败: $error")),
+    );
+  }
+
+  Widget _buildNotFound() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("菜品详情"),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Theme.of(context).primaryColor,
+          statusBarIconBrightness: Brightness.light,
           statusBarBrightness: Brightness.light,
         ),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 菜品图片
-                  _buildDishImage(context),
+      ),
+      body: const Center(child: Text("菜品不存在")),
+    );
+  }
 
-                  // 菜品名称和价格
-                  _buildNameAndPrice(context, dish),
-
-                  // 菜品信息
-                  _buildDishInfo(context, dish),
-
-                  const SizedBox(height: 12),
-
-                  // 价格趋势
-                  _buildPriceTrend(context, dish),
-                ],
-              ),
+  /// 构建菜品详情内容
+  /// 
+  /// 包括菜品图片轮播、名称、价格、信息、价格趋势图表
+  Widget _buildContent(BuildContext context, Dish dish) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDishImage(context),
+                _buildNameAndPrice(context, dish),
+                _buildDishInfo(context, dish),
+                const SizedBox(height: 12),
+                _buildPriceTrend(context, dish),
+              ],
             ),
-            // 左上角返回按钮
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 8,
-              left: 16,
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(180),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.black87,
-                    size: 20,
-                  ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            left: 16,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(180),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black87,
+                  size: 20,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -203,7 +240,7 @@ class _DishDetailPageState extends State<DishDetailPage> {
           // 菜品名称
           Expanded(
             child: Text(
-              dish.name,
+              dish.name ?? "未知菜品",
               style: titleStyle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -214,14 +251,15 @@ class _DishDetailPageState extends State<DishDetailPage> {
           Consumer<AppProvider>(
             builder: (context, appProvider, child) {
               final targetUnit = appProvider.userSettings.priceUnit;
-              final convertedPrice = UnitConverter.convertPrice(dish.price, targetUnit);
               final unitText = PriceUnits.getDisplayName(targetUnit);
+              final price = dish.price;
+              final priceText = price == null ? "--" : UnitConverter.convertPrice(price.toDouble(), targetUnit).toStringAsFixed(2);
               
               return RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: convertedPrice.toStringAsFixed(2),
+                      text: priceText,
                       style: TextStyle(
                         fontSize: titleFontSize,
                         color: Colors.red,
@@ -252,9 +290,9 @@ class _DishDetailPageState extends State<DishDetailPage> {
       color: Colors.white,
       child: Row(
         children: [
-          _buildInfoTag('城市', dish.city),
+          _buildInfoTag("城市", dish.region ?? "未知"),
           const SizedBox(width: 8),
-          _buildInfoTag('分类', dish.category),
+          _buildInfoTag("分类", dish.categoryId ?? "未知"),
         ],
       ),
     );
@@ -269,7 +307,7 @@ class _DishDetailPageState extends State<DishDetailPage> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        '$label: $value',
+        "$label: $value",
         style: const TextStyle(
           fontSize: 12,
           color: Colors.grey,
@@ -292,7 +330,7 @@ class _DishDetailPageState extends State<DishDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '价格趋势',
+                "价格趋势",
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               // 日期范围选择
@@ -305,7 +343,7 @@ class _DishDetailPageState extends State<DishDetailPage> {
                     border: Border.all(color: Colors.grey.shade300),
                   ),
                   child: Text(
-                    '${_formatDate(_startDate)}  —  ${_formatDate(_endDate)}',
+                    "${_formatDate(_startDate)}  —  ${_formatDate(_endDate)}",
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -321,9 +359,10 @@ class _DishDetailPageState extends State<DishDetailPage> {
           SizedBox(
             height: 200,
             child: PriceTrendChart(
-              dishId: dish.id,
+              dishId: dish.dishId ?? "",
+              region: dish.region ?? "",
               startDate: _startDate,
-              endDate: _endDate,
+              endDate: _endDate, 
             ),
           ),
         ],
@@ -351,6 +390,6 @@ class _DishDetailPageState extends State<DishDetailPage> {
 
   /// 格式化日期
   String _formatDate(DateTime date) {
-    return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
+    return "${date.year}.${date.month.toString().padLeft(2, "0")}.${date.day.toString().padLeft(2, "0")}";
   }
 }
