@@ -1,217 +1,132 @@
-import 'package:hive/hive.dart';
-import 'package:recipe_ledger/models/dish.dart';
-import 'package:recipe_ledger/constants/app_constants.dart';
+import "package:hive/hive.dart";
+import "package:recipe_ledger/constants/app_constants.dart";
+import "package:recipe_ledger/models/dish.dart";
+import "package:recipe_ledger/models/dish_list_item.dart";
+import "package:recipe_ledger/models/dish_price_history.dart";
+import "package:recipe_ledger/models/pagination.dart";
+import "package:recipe_ledger/utils/request.dart";
 
 /// 菜品服务类
-///
-/// 负责菜品的业务逻辑，包括数据的获取、存储、搜索和排序。
+/// 负责菜品的业务逻辑，包括数据的获取、存储、搜索和排序
 class DishService {
-  /// 获取所有菜品
+  final Request _request = Request();
+
+  /// 获取菜品列表
   ///
-  /// 参数：
-  /// - `city`: 城市筛选（可选）
-  /// - `forceRefresh`: 是否强制刷新（从网络获取）
-  ///
-  /// 返回：菜品列表
-  Future<List<Dish>> getAllDishes({
-    String? city,
-    bool forceRefresh = false,
+  /// 优先从网络获取，失败时从本地缓存读取
+  Future<ResponsePagination<DishListItem>> getList({
+    int pageNum = 1,
+    int pageSize = 10,
+    String? name,
+    String? region,
+    String? categoryId,
   }) async {
     try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-
-      // 从本地存储获取数据
-      List<Dish> dishes = dishBox.values.toList();
-
-      // 按城市筛选
-      if (city != null) {
-        dishes = dishes.where((dish) => dish.city == city).toList();
-      }
-
-      // TODO: 实现网络同步逻辑
-      // if (forceRefresh) {
-      //   final remoteDishes = await _fetchDishesFromServer();
-      //   await _updateLocalStorage(remoteDishes);
-      //   dishes = remoteDishes;
-      // }
-
-      return dishes;
-    } catch (error) {
-      throw Exception('获取菜品列表失败: $error');
+      final res = await _request.get<ResponsePagination<DishListItem>>(
+        "/dish/getPage",
+        params: {
+          "pageNum": pageNum,
+          "pageSize": pageSize,
+          if (name != null && name.isNotEmpty) "name": name,
+          if (region != null && region.isNotEmpty) "region": region,
+          if (categoryId != null && categoryId.isNotEmpty) "categoryId": categoryId,
+        },
+        fromJson: (data) => ResponsePagination.fromJson(data, DishListItem.fromJson),
+      );
+      await saveListToCache(res.list);
+      return res;
+    } catch (e) {
+      final res = await getListFromCache(
+        name: name,
+        region: region,
+        categoryId: categoryId,
+      );
+      return ResponsePagination(
+        list: res,
+        pageNum: pageNum,
+        pageSize: pageSize,
+        pages: 1,
+        total: res.length,
+      );
     }
   }
 
-  /// 根据ID获取菜品
-  Future<Dish?> getDishById(String id) async {
-    try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-      return dishBox.values.firstWhere((dish) => dish.id == id);
-    } catch (error) {
-      throw Exception('获取菜品详情失败: $error');
+  /// 从本地缓存获取列表数据
+  Future<List<DishListItem>> getListFromCache({
+    String? name,
+    String? region,
+    String? categoryId,
+  }) async {
+    final dishBox = await Hive.openBox<DishListItem>(HiveConstants.dishListBox);
+    return dishBox.values
+        .where((e) => name == null || e.name.contains(name))
+        .where((e) => region == null || e.region == region)
+        .where((e) => categoryId == null || e.categoryId == categoryId)
+        .toList();
+  }
+
+  /// 保存列表数据到本地缓存
+  Future<void> saveListToCache(List<DishListItem> dishes) async {
+    final dishBox = await Hive.openBox<DishListItem>(HiveConstants.dishListBox);
+    await dishBox.clear();
+    for (final dish in dishes) {
+      await dishBox.put(dish.dishId, dish);
     }
   }
 
-  /// 搜索菜品
+  /// 清空列表缓存
+  Future<void> clearListCache() async {
+    final dishBox = await Hive.openBox<DishListItem>(HiveConstants.dishListBox);
+    await dishBox.clear();
+  }
+
+  /// 获取单个菜品详情
   ///
-  /// 参数：
-  /// - `query`: 搜索关键词
-  /// - `city`: 城市筛选（可选）
-  ///
-  /// 返回：匹配的菜品列表
-  Future<List<Dish>> searchDishes(String query, {String? city}) async {
+  /// 优先从网络获取，失败时从本地缓存读取
+  Future<Dish?> get(String dishId) async {
     try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-      List<Dish> dishes = dishBox.values.toList();
-
-      // 按城市筛选
-      if (city != null) {
-        dishes = dishes.where((dish) => dish.city == city).toList();
-      }
-
-      // 按名称搜索（不区分大小写）
-      final normalizedQuery = query.toLowerCase();
-      dishes = dishes
-          .where((dish) => dish.name.toLowerCase().contains(normalizedQuery))
-          .toList();
-
-      return dishes;
-    } catch (error) {
-      throw Exception('搜索菜品失败: $error');
+      final res = await _request.get<Dish>(
+        "/dish/getOne",
+        params: {"id": dishId},
+        fromJson: (data) => Dish.fromJson(data),
+      );
+      await saveToCache(res);
+      return res;
+    } catch (e) {
+      return await getFromCache(dishId);
     }
   }
 
-  /// 添加菜品
-  Future<void> addDish(Dish dish) async {
-    try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-      await dishBox.put(dish.id, dish);
-    } catch (error) {
-      throw Exception('添加菜品失败: $error');
-    }
+  /// 从本地缓存获取单个菜品
+  Future<Dish?> getFromCache(String dishId) async {
+    final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
+    return dishBox.get(dishId);
   }
 
-  /// 更新菜品
-  Future<void> updateDish(Dish dish) async {
-    try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-      await dishBox.put(dish.id, dish);
-    } catch (error) {
-      throw Exception('更新菜品失败: $error');
-    }
+  /// 保存单个菜品到本地缓存
+  Future<void> saveToCache(Dish dish) async {
+    final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
+    await dishBox.put(dish.dishId, dish);
   }
 
-  /// 删除菜品
-  Future<void> deleteDish(String id) async {
-    try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-      await dishBox.delete(id);
-    } catch (error) {
-      throw Exception('删除菜品失败: $error');
-    }
-  }
-
-  /// 批量添加菜品
-  Future<void> addDishes(List<Dish> dishes) async {
-    try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-
-      for (final dish in dishes) {
-        await dishBox.put(dish.id, dish);
-      }
-    } catch (error) {
-      throw Exception('批量添加菜品失败: $error');
-    }
-  }
-
-  /// 清空所有菜品数据
-  Future<void> clearAllDishes() async {
-    try {
-      final dishBox = await Hive.openBox<Dish>(HiveConstants.dishBox);
-      await dishBox.clear();
-    } catch (error) {
-      throw Exception('清空菜品数据失败: $error');
-    }
-  }
-
-  /// 获取菜品价格统计
-  Future<Map<String, dynamic>> getPriceStatistics({String? city}) async {
-    try {
-      final dishes = await getAllDishes(city: city);
-
-      if (dishes.isEmpty) {
-        return {
-          'count': 0,
-          'averagePrice': 0.0,
-          'minPrice': 0.0,
-          'maxPrice': 0.0,
-        };
-      }
-
-      final prices = dishes.map((dish) => dish.price).toList();
-      final averagePrice = prices.reduce((a, b) => a + b) / prices.length;
-      final minPrice = prices.reduce((a, b) => a < b ? a : b);
-      final maxPrice = prices.reduce((a, b) => a > b ? a : b);
-
-      return {
-        'count': dishes.length,
-        'averagePrice': averagePrice,
-        'minPrice': minPrice,
-        'maxPrice': maxPrice,
-      };
-    } catch (error) {
-      throw Exception('获取价格统计失败: $error');
-    }
-  }
-
-  /// 初始化模拟数据（开发用）
-  Future<void> initializeMockData() async {
-    try {
-      final mockDishes = [
-        Dish(
-          id: '1',
-          name: '西红柿',
-          price: 4.16, // 元/斤
-          city: '广州市',
-          updateTime: DateTime.now().subtract(const Duration(days: 1)),
-          category: DishCategories.fruitVegetables, // 果菜类
-        ),
-        Dish(
-          id: '2',
-          name: '鸡蛋',
-          price: 5.59, // 元/斤
-          city: '广州市',
-          updateTime: DateTime.now().subtract(const Duration(days: 2)),
-          category: DishCategories.eggs, // 蛋类
-        ),
-        Dish(
-          id: '3',
-          name: '猪肉',
-          price: 17.38, // 元/斤
-          city: '广州市',
-          updateTime: DateTime.now().subtract(const Duration(days: 3)),
-          category: DishCategories.meat, // 肉类
-        ),
-        Dish(
-          id: '4',
-          name: '大米',
-          price: 3.0, // 元/斤
-          city: '广州市',
-          updateTime: DateTime.now().subtract(const Duration(days: 4)),
-          category: DishCategories.grains, // 粮油类
-        ),
-        Dish(
-          id: '5',
-          name: '白菜',
-          price: 2.80, // 元/斤
-          city: '广州市',
-          updateTime: DateTime.now().subtract(const Duration(days: 5)),
-          category: DishCategories.leafyVegetables, // 叶菜类
-        ),
-      ];
-
-      await addDishes(mockDishes);
-    } catch (error) {
-      throw Exception('初始化模拟数据失败: $error');
-    }
+  /// 获取菜品价格历史
+  Future<List<DishPriceHistory>> getPriceHistory({
+    required String dishId,
+    required String region,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final res = await _request.get<List<DishPriceHistory>>(
+      "/dish/getPriceHistory",
+      params: {
+        "dishId": dishId,
+        "region": region,
+        if (startDate != null) "startDate": startDate.toIso8601String().split("T")[0],
+        if (endDate != null) "endDate": endDate.toIso8601String().split("T")[0],
+      },
+      fromJson: (data) =>
+          (data as List).map((e) => DishPriceHistory.fromJson(e)).toList(),
+    );
+    return res;
   }
 }

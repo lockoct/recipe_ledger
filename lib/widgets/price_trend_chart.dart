@@ -1,17 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
+import "package:flutter/material.dart";
+import "package:provider/provider.dart";
+import "package:fl_chart/fl_chart.dart";
+import "package:intl/intl.dart";
 
-import 'package:recipe_ledger/models/price_record.dart';
-import 'package:recipe_ledger/providers/price_record_provider.dart';
-import 'package:recipe_ledger/providers/app_provider.dart';
-import 'package:recipe_ledger/constants/app_constants.dart';
+import "package:recipe_ledger/models/dish_price_history.dart";
+import "package:recipe_ledger/providers/dish_provider.dart";
+import "package:recipe_ledger/providers/app_provider.dart";
+import "package:recipe_ledger/constants/app_constants.dart";
 
 /// 价格趋势图表组件
 class PriceTrendChart extends StatefulWidget {
   /// 菜品ID
   final String dishId;
+
+  /// 区域
+  final String region;
 
   /// 开始日期
   final DateTime startDate;
@@ -22,6 +25,7 @@ class PriceTrendChart extends StatefulWidget {
   const PriceTrendChart({
     super.key,
     required this.dishId,
+    required this.region,
     required this.startDate,
     required this.endDate,
   });
@@ -31,7 +35,7 @@ class PriceTrendChart extends StatefulWidget {
 }
 
 class _PriceTrendChartState extends State<PriceTrendChart> {
-  List<PriceRecord> _priceRecords = [];
+  List<DishPriceHistory> _priceRecords = [];
   bool _isLoading = true;
 
   @override
@@ -60,9 +64,10 @@ class _PriceTrendChartState extends State<PriceTrendChart> {
     });
 
     try {
-      final provider = context.read<PriceRecordProvider>();
-      final records = await provider.getPriceRecords(
+      final provider = context.read<DishProvider>();
+      final records = await provider.getPriceHistory(
         dishId: widget.dishId,
+        region: widget.region,
         startDate: widget.startDate,
         endDate: widget.endDate,
       );
@@ -94,18 +99,25 @@ class _PriceTrendChartState extends State<PriceTrendChart> {
 
     if (_priceRecords.isEmpty) {
       return Center(
-        child: Text('暂无价格数据', style: TextStyle(color: Colors.grey[500])),
+        child: Text("暂无价格数据", style: TextStyle(color: Colors.grey[500])),
       );
     }
 
-    final sortedRecords = List<PriceRecord>.from(_priceRecords);
-    sortedRecords.sort((a, b) => a.date.compareTo(b.date));
-    final chartData = sortedRecords.map((record) {
-      return _ChartData(
-        date: record.date,
-        price: record.price * conversionFactor,
+    final chartData = _priceRecords
+        .where((record) => record.price != null && record.recordDate != null)
+        .map((record) {
+          return _ChartData(
+            date: record.recordDate!,
+            price: record.price! * conversionFactor,
+          );
+        })
+        .toList();
+
+    if (chartData.isEmpty) {
+      return Center(
+        child: Text("暂无价格数据", style: TextStyle(color: Colors.grey[500])),
       );
-    }).toList();
+    }
 
     final primaryColor = Theme.of(context).primaryColor;
 
@@ -125,8 +137,12 @@ class _PriceTrendChartState extends State<PriceTrendChart> {
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -165,7 +181,7 @@ class _PriceTrendChartState extends State<PriceTrendChart> {
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    DateFormat('MM.dd').format(date),
+                    DateFormat("MM.dd").format(date),
                     style: TextStyle(color: Colors.grey[600], fontSize: 10),
                   ),
                 );
@@ -190,7 +206,7 @@ class _PriceTrendChartState extends State<PriceTrendChart> {
                 }
                 final date = chartData[index].date;
                 return LineTooltipItem(
-                  '${DateFormat('MM/dd').format(date)}: ${spot.y.toStringAsFixed(3)}',
+                  "${DateFormat("MM/dd").format(date)}: ${spot.y.toStringAsFixed(3)}",
                   const TextStyle(color: Colors.white, fontSize: 12),
                 );
               }).toList();
