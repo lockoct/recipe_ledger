@@ -17,6 +17,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # JSON序列化
+  json_annotation: ^4.9.0
+
   # 国际化
   flutter_localizations:
     sdk: flutter
@@ -69,6 +72,8 @@ dev_dependencies:
 
   # Hive代码生成
   hive_generator: ^2.0.1
+  # JSON序列化
+  json_serializable: ^6.7.1
   build_runner: ^2.4.6
 
   # 代码检查
