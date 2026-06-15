@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:recipe_ledger/models/recipe.dart';
 import 'package:recipe_ledger/models/recipe_ingredient.dart';
-import 'package:recipe_ledger/models/dish.dart';
+import 'package:recipe_ledger/models/dish_list_item.dart';
 import 'package:recipe_ledger/providers/recipe_provider.dart';
 import 'package:recipe_ledger/providers/dish_provider.dart';
 import 'package:recipe_ledger/widgets/add_ingredient_dialog.dart';
@@ -231,14 +231,13 @@ class _RecipeEditPageState extends State<RecipeEditPage>
     if (ingredient.isDish && ingredient.dishId != null) {
       final dishProvider = context.read<DishProvider>();
       final dish = dishProvider.dishes.firstWhere(
-        (d) => d.id == ingredient.dishId,
-        orElse: () => Dish(
-          id: '',
-          name: '未知菜品',
+        (d) => d.dishId == ingredient.dishId,
+        orElse: () => DishListItem(
+          dishId: "",
+          name: "未知菜品",
           price: 0,
-          city: '',
-          updateTime: DateTime.now(),
-          category: '',
+          region: "",
+          categoryId: "",
         ),
       );
       return dish.name;

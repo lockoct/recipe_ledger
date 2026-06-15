@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:recipe_ledger/models/recipe.dart';
 import 'package:recipe_ledger/providers/recipe_provider.dart';
 import 'package:recipe_ledger/pages/recipe/recipe_edit_page.dart';
+import 'package:recipe_ledger/pages/recipe/recipe_detail_page.dart';
 
 /// 菜谱网格页面
 ///
@@ -229,6 +231,7 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
             Container(
               width: double.infinity,
               height: 120,
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: Colors.blue.shade100,
                 borderRadius: const BorderRadius.only(
@@ -236,13 +239,20 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
                   topRight: Radius.circular(12),
                 ),
               ),
-              child: recipe.coverImage != null
-                  ? Image.network(
-                      recipe.coverImage!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                    )
+              child: recipe.coverImage != null && recipe.coverImage!.isNotEmpty
+                  ? (recipe.coverImage!.startsWith('http')
+                      ? Image.network(
+                          recipe.coverImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        )
+                      : Image.file(
+                          File(recipe.coverImage!),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ))
                   : const Icon(
                       Icons.menu_book,
                       size: 48,
@@ -271,13 +281,17 @@ class _RecipeGridPageState extends State<RecipeGridPage> {
   }
 
   /// 查看菜谱详情
-  void _viewRecipeDetail(Recipe recipe) {
-    // TODO: 实现菜谱详情页面
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('查看菜谱: ${recipe.name} (开发中)'),
+  void _viewRecipeDetail(Recipe recipe) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipeDetailPage(recipeId: recipe.id),
       ),
     );
+
+    if (result == true && mounted) {
+      _recipeProvider.loadRecipes();
+    }
   }
 
   /// 添加新菜谱
