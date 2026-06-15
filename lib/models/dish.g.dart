@@ -17,12 +17,12 @@ class DishAdapter extends TypeAdapter<Dish> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Dish(
-      id: fields[0] as String,
-      name: fields[1] as String,
-      price: fields[2] as double,
-      city: fields[3] as String,
-      updateTime: fields[4] as DateTime,
-      category: fields[5] as String,
+      dishId: fields[0] as String?,
+      categoryId: fields[1] as String?,
+      name: fields[2] as String?,
+      price: fields[3] as num?,
+      region: fields[4] as String?,
+      cover: fields[5] as String?,
     );
   }
 
@@ -31,17 +31,17 @@ class DishAdapter extends TypeAdapter<Dish> {
     writer
       ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.id)
+      ..write(obj.dishId)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.categoryId)
       ..writeByte(2)
-      ..write(obj.price)
+      ..write(obj.name)
       ..writeByte(3)
-      ..write(obj.city)
+      ..write(obj.price)
       ..writeByte(4)
-      ..write(obj.updateTime)
+      ..write(obj.region)
       ..writeByte(5)
-      ..write(obj.category);
+      ..write(obj.cover);
   }
 
   @override
@@ -54,3 +54,25 @@ class DishAdapter extends TypeAdapter<Dish> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Dish _$DishFromJson(Map<String, dynamic> json) => Dish(
+      dishId: json['dishId'] as String?,
+      categoryId: json['categoryId'] as String?,
+      name: json['name'] as String?,
+      price: json['price'] as num?,
+      region: json['region'] as String?,
+      cover: json['cover'] as String?,
+    );
+
+Map<String, dynamic> _$DishToJson(Dish instance) => <String, dynamic>{
+      'dishId': instance.dishId,
+      'categoryId': instance.categoryId,
+      'name': instance.name,
+      'price': instance.price,
+      'region': instance.region,
+      'cover': instance.cover,
+    };
