@@ -1,0 +1,22 @@
+﻿# 菜品列表页 - 验证检查清单
+
+- [x] Checkpoint 1: 页面初始化时自动加载第一页数据，显示加载动画
+- [x] Checkpoint 2: 搜索框输入时实时触发搜索，列表即时更新
+- [x] Checkpoint 3: 搜索框清除按钮能清空搜索内容并重置列表
+- [x] Checkpoint 4: 分类筛选栏横向滑动正常，分类标签点击能切换选中状态
+- [x] Checkpoint 5: 分类筛选覆盖层显示正确，一行3个分类网格
+- [x] Checkpoint 6: 点击遮罩或收起按钮能关闭分类覆盖层
+- [x] Checkpoint 7: 菜品卡片布局正确（左图标、中名称价格、右价格变化）
+- [x] Checkpoint 8: 价格变化显示正确（红色向上箭头表示上涨，绿色向下箭头表示下跌）
+- [x] Checkpoint 9: 滚动到列表底部自动加载更多数据
+- [x] Checkpoint 10: 点击菜品卡片能跳转到菜品详情页
+- [x] Checkpoint 11: 网络请求失败时显示缓存数据和重新加载按钮
+- [x] Checkpoint 12: 搜索或筛选结果为空时显示"暂无菜品数据"提示
+- [x] Checkpoint 13: 页面布局适配不同屏幕尺寸
+- [x] Checkpoint 14: 列表滚动流畅，无明显卡顿
+- [x] Checkpoint 15: 状态管理正确，Provider 能正常触发 UI 更新
+- [x] Checkpoint 16: 分页逻辑正确，没有更多数据时不再触发加载
+- [x] Checkpoint 17: DishListItem 模型字段完整，JSON 序列化正常
+- [x] Checkpoint 18: Hive 本地缓存功能正常，数据能正确存储和读取
+- [x] Checkpoint 19: 城市选择功能能正常触发（显示对话框）
+- [x] Checkpoint 20: 页面状态正确（加载中、加载完成、加载失败、空数据）

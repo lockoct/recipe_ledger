@@ -1,0 +1,22 @@
+﻿# 菜品详情页 (DishDetailPage) - 验证检查清单
+
+- [x] Checkpoint 1: 页面初始化时根据 dishId 加载菜品数据，显示加载动画
+- [x] Checkpoint 2: 图片轮播正常自动播放，每3秒切换一次
+- [x] Checkpoint 3: 轮播图指示器正确显示当前图片位置
+- [x] Checkpoint 4: 菜品名称以大字体（titleLarge）显示
+- [x] Checkpoint 5: 菜品价格以红色显示并附带单位
+- [x] Checkpoint 6: 城市和分类信息以灰色标签形式显示
+- [x] Checkpoint 7: 价格趋势图表正常渲染，展示最近7天数据
+- [x] Checkpoint 8: 点击日期范围选择器弹出选择对话框
+- [x] Checkpoint 9: 快捷按钮"近7天"、"近30天"能正常选择日期范围
+- [x] Checkpoint 10: 选择日期范围后价格趋势图表正确刷新
+- [x] Checkpoint 11: 页面左上角返回按钮能正确返回上一级
+- [x] Checkpoint 12: 价格单位变化时，价格和图表自动按新单位显示
+- [x] Checkpoint 13: 加载失败时显示对应的错误提示
+- [x] Checkpoint 14: 菜品不存在时显示"菜品不存在"提示
+- [x] Checkpoint 15: 无价格数据时显示"暂无价格数据"提示
+- [x] Checkpoint 16: 点击价格趋势图表数据点能显示日期和价格
+- [x] Checkpoint 17: 页面布局适配不同屏幕尺寸
+- [x] Checkpoint 18: Dish 模型字段完整，序列化和反序列化正常
+- [x] Checkpoint 19: 状态栏样式配置正确（半透明 + 深色图标）
+- [x] Checkpoint 20: 页面所有交互流畅，无明显卡顿

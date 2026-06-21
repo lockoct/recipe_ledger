@@ -1,0 +1,22 @@
+# 个人中心页 (ProfilePage) - 验证检查清单
+
+- [x] Checkpoint 1: 页面初始化时正常显示，加载时间 < 1秒
+- [x] Checkpoint 2: 用户信息卡片显示正确（头像、用户名、欢迎语）
+- [x] Checkpoint 3: 头像为白色圆形背景配主题色图标
+- [x] Checkpoint 4: 用户名显示'用户'
+- [x] Checkpoint 5: 欢迎语显示'欢迎使用菜谱账本'
+- [x] Checkpoint 6: 功能列表显示四个选项（单位切换、初始化模拟数据、关于、帮助）
+- [x] Checkpoint 7: 点击'单位切换'能跳转到单位切换页面
+- [x] Checkpoint 8: 点击'初始化模拟数据'弹出确认对话框
+- [x] Checkpoint 9: 确认初始化后显示加载状态
+- [x] Checkpoint 10: 初始化失败时显示错误信息
+- [x] Checkpoint 11: 点击'关于'弹出关于对话框，显示版本信息
+- [x] Checkpoint 12: 点击'帮助'弹出帮助对话框，显示使用说明
+- [x] Checkpoint 13: 状态栏颜色与主题色一致
+- [x] Checkpoint 14: 状态栏图标为浅色
+- [x] Checkpoint 15: 页面顶部为主题色渐变背景
+- [x] Checkpoint 16: 页面底部为灰色背景
+- [x] Checkpoint 17: 功能列表为白色卡片样式
+- [x] Checkpoint 18: 底部导航能切换到个人中心页
+- [x] Checkpoint 19: 页面布局适配不同屏幕尺寸
+- [x] Checkpoint 20: 所有交互响应流畅，无明显卡顿

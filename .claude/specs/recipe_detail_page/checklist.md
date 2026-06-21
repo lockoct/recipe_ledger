@@ -1,0 +1,28 @@
+# 菜谱详情页 (RecipeDetailPage) - 验证检查清单
+
+- [x] Checkpoint 1: 页面初始化时正常显示菜谱信息
+- [x] Checkpoint 2: 菜谱不存在时显示提示
+- [x] Checkpoint 3: 封面图片正确展示（覆盖状态栏）
+- [x] Checkpoint 4: 无封面时显示默认菜单书图标
+- [x] Checkpoint 5: 返回按钮能返回上一页
+- [x] Checkpoint 6: 编辑按钮能跳转到菜谱编辑页
+- [x] Checkpoint 7: 删除按钮弹出确认对话框
+- [x] Checkpoint 8: 菜谱名称正确显示，不超过2行
+- [x] Checkpoint 9: 更新时间格式正确（更新于 + 日期）
+- [x] Checkpoint 10: 原材料列表正确展示
+- [x] Checkpoint 11: 菜品类型原材料显示菜品名称
+- [x] Checkpoint 12: 自定义类型原材料显示自定义名称
+- [x] Checkpoint 13: 原材料用量和单位正确显示
+- [x] Checkpoint 14: 菜品类型原材料显示成本
+- [x] Checkpoint 15: 成本计算正确（用量转换为斤）
+- [x] Checkpoint 16: 原材料合计成本正确显示（红色字体）
+- [x] Checkpoint 17: 无原材料时显示暂无原材料提示
+- [x] Checkpoint 18: 做法步骤以只读富文本形式展示
+- [x] Checkpoint 19: 有注意事项时正确展示
+- [x] Checkpoint 20: 无注意事项时隐藏注意事项区域
+- [x] Checkpoint 21: 编辑页保存后返回自动刷新详情
+- [x] Checkpoint 22: 删除确认后删除菜谱并返回
+- [x] Checkpoint 23: 删除成功显示提示
+- [x] Checkpoint 24: 删除失败显示错误提示
+- [x] Checkpoint 25: 状态栏为透明，图标为深色
+- [x] Checkpoint 26: 页面布局适配不同屏幕尺寸
