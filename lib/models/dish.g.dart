@@ -22,7 +22,7 @@ class DishAdapter extends TypeAdapter<Dish> {
       name: fields[2] as String?,
       price: fields[3] as num?,
       region: fields[4] as String?,
-      cover: fields[5] as String?,
+      covers: (fields[5] as List?)?.cast<String>(),
     );
   }
 
@@ -41,7 +41,7 @@ class DishAdapter extends TypeAdapter<Dish> {
       ..writeByte(4)
       ..write(obj.region)
       ..writeByte(5)
-      ..write(obj.cover);
+      ..write(obj.covers);
   }
 
   @override
@@ -65,7 +65,8 @@ Dish _$DishFromJson(Map<String, dynamic> json) => Dish(
       name: json['name'] as String?,
       price: json['price'] as num?,
       region: json['region'] as String?,
-      cover: json['cover'] as String?,
+      covers:
+          (json['covers'] as List<dynamic>?)?.map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$DishToJson(Dish instance) => <String, dynamic>{
@@ -74,5 +75,5 @@ Map<String, dynamic> _$DishToJson(Dish instance) => <String, dynamic>{
       'name': instance.name,
       'price': instance.price,
       'region': instance.region,
-      'cover': instance.cover,
+      'covers': instance.covers,
     };

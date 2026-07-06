@@ -27,9 +27,9 @@ class Dish {
   @HiveField(4)
   final String? region;
 
-  /// 封面路径
+  /// 封面列表
   @HiveField(5)
-  final String? cover;
+  final List<String>? covers;
 
   /// 构造函数
   Dish({
@@ -38,7 +38,7 @@ class Dish {
     this.name,
     this.price,
     this.region,
-    this.cover,
+    this.covers,
   });
 
   /// 反序列化

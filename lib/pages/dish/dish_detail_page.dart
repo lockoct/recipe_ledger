@@ -37,13 +37,6 @@ class _DishDetailPageState extends State<DishDetailPage> {
   /// 当前轮播索引
   int _currentImageIndex = 0;
 
-  /// 模拟图片列表（后续可从菜品数据中获取）
-  final List<String> _imageList = [
-    "assets/demo.jpeg",
-    "assets/demo.jpeg",
-    "assets/demo.jpeg",
-  ];
-
   Future<Dish?>? _dishFuture;
 
   @override
@@ -134,7 +127,7 @@ class _DishDetailPageState extends State<DishDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDishImage(context),
+                _buildDishImage(context, dish),
                 _buildNameAndPrice(context, dish),
                 _buildDishInfo(context, dish),
                 const SizedBox(height: 12),
@@ -168,59 +161,83 @@ class _DishDetailPageState extends State<DishDetailPage> {
   }
 
   /// 构建菜品图片轮播
-  Widget _buildDishImage(BuildContext context) {
+  Widget _buildDishImage(BuildContext context, Dish dish) {
     final statusBarHeight = MediaQuery.of(context).padding.top;
+    final covers = dish.covers ?? [];
     
     return SizedBox(
       width: double.infinity,
       height: 280 + statusBarHeight,
-      child: Stack(
-        children: [
-          // 轮播图
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 280 + statusBarHeight,
-              viewportFraction: 1.0,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 3),
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentImageIndex = index;
-                });
-              },
-            ),
-            items: _imageList.map((imagePath) {
-              return Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              );
-            }).toList(),
-          ),
-          // 指示器
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: _imageList.asMap().entries.map((entry) {
-                return Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _currentImageIndex == entry.key
-                        ? Colors.white
-                        : Colors.white.withAlpha(100),
+      child: covers.isEmpty
+          ? Container(
+              color: Colors.grey.shade200,
+              child: Center(
+                child: Icon(
+                  Icons.restaurant,
+                  size: 60,
+                  color: Colors.grey.shade400,
+                ),
+              ),
+            )
+          : Stack(
+              children: [
+                // 轮播图
+                CarouselSlider(
+                  options: CarouselOptions(
+                    height: 280 + statusBarHeight,
+                    viewportFraction: 1.0,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 3),
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
                   ),
-                );
-              }).toList(),
+                  items: covers.map((coverPath) {
+                    return Image.network(
+                      coverPath,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 48,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+                // 指示器
+                Positioned(
+                  bottom: 10,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: covers.asMap().entries.map((entry) {
+                      return Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentImageIndex == entry.key
+                              ? Colors.white
+                              : Colors.white.withAlpha(100),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
