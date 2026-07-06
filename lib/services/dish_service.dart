@@ -1,9 +1,11 @@
+import "package:flutter/foundation.dart";
 import "package:hive/hive.dart";
 import "package:recipe_ledger/constants/app_constants.dart";
 import "package:recipe_ledger/models/dish.dart";
 import "package:recipe_ledger/models/dish_list_item.dart";
 import "package:recipe_ledger/models/dish_price_history.dart";
 import "package:recipe_ledger/models/pagination.dart";
+import "package:recipe_ledger/utils/cache_meta.dart";
 import "package:recipe_ledger/utils/request.dart";
 
 /// 菜品服务类
@@ -11,73 +13,119 @@ import "package:recipe_ledger/utils/request.dart";
 class DishService {
   final Request _request = Request();
 
+  static const _syncDateKey = "dish_list_sync_date";
+  static const _fullyLoadedKey = "dish_list_fully_loaded";
+
   /// 获取菜品列表
   ///
-  /// 优先从网络获取，失败时从本地缓存读取
+  /// 本地优先策略：无筛选且缓存新鲜时直接返回本地数据；
+  /// 缓存过期/无缓存时清空缓存重新请求网络；
+  /// 有筛选条件时直接请求网络，不走缓存。
   Future<ResponsePagination<DishListItem>> getList({
     int pageNum = 1,
     int pageSize = 10,
     String? name,
     String? region,
     String? categoryId,
+    bool forceRefresh = false,
   }) async {
+    final hasFilter = (name != null && name.isNotEmpty) ||
+        (region != null && region.isNotEmpty) ||
+        (categoryId != null && categoryId.isNotEmpty);
+
     try {
-      final res = await _request.get<ResponsePagination<DishListItem>>(
-        "/dish/getPage",
-        params: {
-          "pageNum": pageNum,
-          "pageSize": pageSize,
-          if (name != null && name.isNotEmpty) "name": name,
-          if (region != null && region.isNotEmpty) "region": region,
-          if (categoryId != null && categoryId.isNotEmpty) "categoryId": categoryId,
-        },
-        fromJson: (data) => ResponsePagination.fromJson(data, DishListItem.fromJson),
-      );
-      await saveListToCache(res.list);
-      return res;
-    } catch (e) {
-      final res = await getListFromCache(
-        name: name,
-        region: region,
-        categoryId: categoryId,
-      );
-      return ResponsePagination(
-        list: res,
-        pageNum: pageNum,
-        pageSize: pageSize,
-        pages: 1,
-        total: res.length,
-      );
+      // 筛选/搜索 → 请求网络，不缓存结果
+      if (hasFilter) {
+        debugPrint("[DishService.getList] 筛选/搜索，请求网络");
+        return await _getListFromNetwork(pageNum, pageSize, name, region, categoryId, false, cacheResults: false);
+      }
+
+      // 加载更多 → 请求网络，追加缓存
+      if (pageNum > 1) {
+        debugPrint("[DishService.getList] 加载更多，请求网络");
+        return await _getListFromNetwork(pageNum, pageSize, name, region, categoryId, false);
+      }
+
+      // 强制刷新 → 请求网络，清空缓存
+      if (forceRefresh) {
+        debugPrint("[DishService.getList] 强制刷新，请求网络");
+        return await _getListFromNetwork(pageNum, pageSize, name, region, categoryId, true);
+      }
+
+      // 缓存新鲜 → 返回缓存
+      if (await CacheMetaUtils.isFresh(_syncDateKey)) {
+        debugPrint("[DishService.getList] 缓存新鲜，返回本地缓存");
+        return await _getListFromCache(pageSize);
+      }
+
+      // 缓存过期/无缓存 → 请求网络，清空缓存
+      debugPrint("[DishService.getList] 缓存过期或无缓存，请求网络");
+      return await _getListFromNetwork(pageNum, pageSize, name, region, categoryId, true);
+    } catch (_) {
+      debugPrint("[DishService.getList] 网络请求失败，返回本地缓存");
+      return await _getListFromCache(pageSize);
     }
   }
 
-  /// 从本地缓存获取列表数据
-  Future<List<DishListItem>> getListFromCache({
-    String? name,
-    String? region,
-    String? categoryId,
-  }) async {
-    final dishBox = await Hive.openBox<DishListItem>(HiveConstants.dishListBox);
-    return dishBox.values
-        .where((e) => name == null || e.name.contains(name))
-        .where((e) => region == null || e.region == region)
-        .where((e) => categoryId == null || e.categoryId == categoryId)
-        .toList();
-  }
-
   /// 保存列表数据到本地缓存
-  Future<void> saveListToCache(List<DishListItem> dishes) async {
+  ///
+  /// [clear] 为 true 时先清空再写入（第一页），false 时追加写入（加载更多）
+  Future<void> saveListToCache(List<DishListItem> dishes, {bool clear = false}) async {
     final dishBox = await Hive.openBox<DishListItem>(HiveConstants.dishListBox);
-    await dishBox.clear();
+    if (clear) {
+      await dishBox.clear();
+    }
     for (final dish in dishes) {
       await dishBox.put(dish.dishId, dish);
     }
   }
 
-  /// 清空列表缓存
-  Future<void> clearListCache() async {
+  /// 从网络请求数据
+  Future<ResponsePagination<DishListItem>> _getListFromNetwork(
+    int pageNum,
+    int pageSize,
+    String? name,
+    String? region,
+    String? categoryId,
+    bool clearCache,
+    {bool cacheResults = true}
+  ) async {
+    final res = await _request.get<ResponsePagination<DishListItem>>(
+      "/dish/getPage",
+      params: {
+        "pageNum": pageNum,
+        "pageSize": pageSize,
+        if (name != null && name.isNotEmpty) "name": name,
+        if (region != null && region.isNotEmpty) "region": region,
+        if (categoryId != null && categoryId.isNotEmpty) "categoryId": categoryId,
+      },
+      fromJson: (data) => ResponsePagination.fromJson(data, DishListItem.fromJson),
+    );
+
+    if (cacheResults) {
+      if (clearCache) {
+        await CacheMetaUtils.clear(_syncDateKey, _fullyLoadedKey);
+      }
+      await saveListToCache(res.list, clear: clearCache);
+      await CacheMetaUtils.set(_syncDateKey, CacheMetaUtils.today);
+      await CacheMetaUtils.set(_fullyLoadedKey, pageNum == res.pages ? "true" : "false");
+    }
+    return res;
+  }
+
+  /// 从本地缓存返回数据（不走分页，全部返回）
+  Future<ResponsePagination<DishListItem>> _getListFromCache(int pageSize) async {
     final dishBox = await Hive.openBox<DishListItem>(HiveConstants.dishListBox);
-    await dishBox.clear();
+    final list = dishBox.values.toList();
+    final cachePageNum = (list.length / pageSize).ceil();
+    final fullyLoaded = await CacheMetaUtils.isFullyLoaded(_fullyLoadedKey);
+    return ResponsePagination(
+      list: list,
+      pageNum: cachePageNum,
+      pageSize: list.length,
+      pages: fullyLoaded ? cachePageNum : cachePageNum + 1,
+      total: list.length,
+    );
   }
 
   /// 获取单个菜品详情

@@ -46,7 +46,7 @@ class _DishListPageState extends State<DishListPage> {
   @override
   void initState() {
     super.initState();
-    _dishListFuture = Provider.of<DishProvider>(context, listen: false).getList(refresh: true);
+    _dishListFuture = Provider.of<DishProvider>(context, listen: false).getList(refresh: false);
   }
 
   @override
@@ -195,19 +195,38 @@ class _DishListPageState extends State<DishListPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch, // 拉伸子组件填满高度
               children: [
-                // 左侧：菜品图标（圆角正方形，高度贴合列表项）
-                Container(
-                  width: 70,
-                  height: 70,
-                  margin: const EdgeInsets.only(right: 12), // 占位图与文本间距
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withAlpha(25),
-                    borderRadius: BorderRadius.circular(8), // 圆角正方形
-                  ),
-                  child: const Icon(
-                    Icons.restaurant,
-                    color: Colors.blue,
-                    size: 24,
+                // 左侧：菜品封面图
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: dish.cover != null && dish.cover!.isNotEmpty
+                          ? Image.network(
+                              "${dish.cover}",
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Theme.of(context).primaryColor.withAlpha(25),
+                                  child: const Icon(
+                                    Icons.restaurant,
+                                    color: Colors.blue,
+                                    size: 24,
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: Theme.of(context).primaryColor.withAlpha(25),
+                              child: const Icon(
+                                Icons.restaurant,
+                                color: Colors.blue,
+                                size: 24,
+                              ),
+                            ),
+                    ),
                   ),
                 ),
 

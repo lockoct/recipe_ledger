@@ -58,6 +58,7 @@ class DishProvider extends ChangeNotifier {
       name: _queryForm.name.isNotEmpty ? _queryForm.name : null,
       region: _queryForm.region,
       categoryId: _queryForm.categoryId,
+      forceRefresh: refresh,
     );
 
     if (refresh) {
@@ -67,6 +68,7 @@ class DishProvider extends ChangeNotifier {
     }
     _pagination.total = response.total;
     _pagination.pages = response.pages;
+    _pagination.pageNum = response.pageNum;
     notifyListeners();
 
     return response;

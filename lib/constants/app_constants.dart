@@ -85,6 +85,7 @@ class HiveConstants {
   static const String dishListBox = 'dish_list_box';
   static const String recipeBox = 'recipe_box';
   static const String userSettingsBox = 'user_settings_box';
+  static const String cacheMetaBox = 'cache_meta_box';
 
   /// TypeId定义（从100开始递增）
   static const int dishTypeId = 100;
