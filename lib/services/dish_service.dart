@@ -103,9 +103,6 @@ class DishService {
     );
 
     if (cacheResults) {
-      if (clearCache) {
-        await CacheMetaUtils.clear(_syncDateKey, _fullyLoadedKey);
-      }
       await saveListToCache(res.list, clear: clearCache);
       await CacheMetaUtils.set(_syncDateKey, CacheMetaUtils.today);
       await CacheMetaUtils.set(_fullyLoadedKey, pageNum == res.pages ? "true" : "false");
@@ -128,19 +125,36 @@ class DishService {
     );
   }
 
+  /// 生成菜品详情缓存同步日期 key
+  String _getSyncDateKey(String dishId) => "dish_detail_${dishId}_sync_date";
+
   /// 获取单个菜品详情
   ///
-  /// 优先从网络获取，失败时从本地缓存读取
+  /// 本地优先策略：缓存新鲜时直接返回本地数据；
+  /// 缓存过期/无缓存时请求网络；
+  /// 网络失败时返回旧缓存兜底。
   Future<Dish?> get(String dishId) async {
+    final syncDateKey = _getSyncDateKey(dishId);
+
     try {
+      // 缓存新鲜 → 返回本地缓存
+      if (await CacheMetaUtils.isFresh(syncDateKey)) {
+        debugPrint("[DishService.get] 缓存新鲜，返回本地缓存");
+        return await getFromCache(dishId);
+      }
+
+      // 缓存过期/无缓存 → 请求网络
+      debugPrint("[DishService.get] 缓存过期或无缓存，请求网络");
       final res = await _request.get<Dish>(
         "/dish/getOne",
         params: {"id": dishId},
         fromJson: (data) => Dish.fromJson(data),
       );
       await saveToCache(res);
+      await CacheMetaUtils.set(syncDateKey, CacheMetaUtils.today);
       return res;
-    } catch (e) {
+    } catch (_) {
+      debugPrint("[DishService.get] 网络请求失败，返回本地缓存");
       return await getFromCache(dishId);
     }
   }

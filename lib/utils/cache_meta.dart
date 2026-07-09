@@ -39,12 +39,6 @@ class CacheMetaUtils {
     return val == "true";
   }
 
-  /// 清空指定模块的缓存元数据
-  static Future<void> clear(String syncDateKey, String fullyLoadedKey) async {
-    await delete(syncDateKey);
-    await delete(fullyLoadedKey);
-  }
-
   /// 获取今天日期字符串（yyyy-MM-dd）
   static String get today => DateTime.now().toIso8601String().split("T")[0];
 }
